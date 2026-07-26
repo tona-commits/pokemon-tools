@@ -1,0 +1,60 @@
+<div class="toolbar">
+  <input
+    type="search"
+    class="search-input"
+    placeholder="名前 または 図鑑番号で検索"
+    [value]="searchTerm()"
+    (input)="searchTerm.set($any($event.target).value)"
+  />
+  <button type="button" class="csv-btn" (click)="downloadCsv()" [disabled]="loading() || loadError()">
+    CSVダウンロード
+  </button>
+</div>
+
+<label class="family-toggle">
+  <input
+    type="checkbox"
+    [checked]="showFamily()"
+    (change)="showFamily.set($any($event.target).checked)"
+  />
+  進化系もまとめて表示
+</label>
+
+@if (loading()) {
+  <p class="status">読み込み中...</p>
+} @else if (loadError()) {
+  <p class="status error">データの読み込みに失敗しました。</p>
+} @else {
+  <p class="status count">{{ filteredSorted().length }}匹表示中</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="sortable" (click)="setSort('dex')">図鑑番号</th>
+          <th>名前</th>
+          <th>タイプ</th>
+          <th class="sortable" (click)="setSort('atk')">こうげき</th>
+          <th class="sortable" (click)="setSort('def')">ぼうぎょ</th>
+          <th class="sortable" (click)="setSort('hp')">HP</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of filteredSorted(); track p.speciesId) {
+          <tr>
+            <td>#{{ p.dex }}</td>
+            <td>{{ p.name }}</td>
+            <td class="type-cell">
+              @for (t of p.types; track t) {
+                <span class="badge" [style.background]="typeColor[t]">{{ typeLabel[t] }}</span>
+              }
+            </td>
+            <td>{{ p.atk }}</td>
+            <td>{{ p.def }}</td>
+            <td>{{ p.hp }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

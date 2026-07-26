@@ -23,6 +23,30 @@
   }
 }
 
+.tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+
+  button {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+
+    &.active {
+      background: #333;
+      border-color: #333;
+      color: #fff;
+    }
+  }
+}
+
 .selected-bar {
   display: flex;
   align-items: center;
