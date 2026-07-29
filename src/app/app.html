@@ -1,66 +1,13 @@
-<main class="page">
-  <header class="header">
-    <h1>ポケモン タイプ相性チェッカー</h1>
-    <p class="subtitle">ポケモンGO仕様のタイプ相性・種族値ツール</p>
-  </header>
-
-  <nav class="tabs" aria-label="表示切り替え">
-    <button type="button" [class.active]="activeTab() === 'compat'" (click)="setTab('compat')">
-      タイプ相性
-    </button>
-    <button type="button" [class.active]="activeTab() === 'stats'" (click)="setTab('stats')">
-      種族値一覧
-    </button>
-  </nav>
-
-  @if (activeTab() === 'compat') {
-    <section class="selected-bar">
-      <div class="selected-badges" aria-label="選択中のタイプ">
-        @if (selectedTypeInfos().length === 0) {
-          <span class="placeholder">タイプを選んでください</span>
-        }
-        @for (t of selectedTypeInfos(); track t.name) {
-          <span class="badge" [style.background]="t.color">{{ t.label }}</span>
-        }
-      </div>
-      <button
-        type="button"
-        class="clear-btn"
-        (click)="clearSelection()"
-        [disabled]="selectedTypeInfos().length === 0"
-      >
-        クリア
-      </button>
-    </section>
-
-    <section class="type-grid" aria-label="タイプを選択">
-      @for (t of types; track t.name) {
-        <button
-          type="button"
-          class="type-btn"
-          [class.selected]="isSelected(t.name)"
-          [style.background]="t.color"
-          [style.--type-color]="t.color"
-          (click)="toggleType(t.name)"
-        >
-          {{ t.label }}
-        </button>
-      }
-    </section>
-
-    <section class="results">
-      @for (group of groups(); track group.multiplier) {
-        <div class="result-group" [class.emphasis]="group.multiplier >= 1.6">
-          <h2 class="result-label">{{ group.label }}</h2>
-          <div class="chip-row">
-            @for (t of group.types; track t.name) {
-              <span class="badge" [style.background]="t.color">{{ t.label }}</span>
-            }
-          </div>
-        </div>
-      }
-    </section>
-  } @else {
-    <app-pokemon-stats-list />
-  }
-</main>
+@if (screen() === 'home') {
+  <main class="home">
+    <h1>ツール選択</h1>
+    <div class="menu">
+      <button type="button" class="menu-btn" (click)="goTo('pokemon')">ポケモン</button>
+      <button type="button" class="menu-btn" (click)="goTo('kanji')">漢字</button>
+    </div>
+  </main>
+} @else if (screen() === 'pokemon') {
+  <app-pokemon-feature (back)="goTo('home')" />
+} @else {
+  <app-kanji-feature (back)="goTo('home')" />
+}

@@ -1,0 +1,100 @@
+@if (screen() === 'menu') {
+  <main class="page">
+    <header class="header">
+      <button type="button" class="back-btn" (click)="back.emit()">← もどる</button>
+      <h1>漢字の読み方テスト</h1>
+      <p class="subtitle">小学4年生でならう漢字(202字)</p>
+    </header>
+
+    @if (loading()) {
+      <p class="status">読み込み中...</p>
+    } @else if (loadError()) {
+      <p class="status error">データの読み込みに失敗しました。</p>
+    } @else {
+      <button
+        type="button"
+        class="retest-btn"
+        [disabled]="wrongKanji().length === 0"
+        (click)="startRetest()"
+      >
+        まちがえた問題を復習する({{ wrongKanji().length }}問)
+      </button>
+
+      <div class="set-grid">
+        @for (set of sets(); track $index) {
+          <button type="button" class="set-btn" (click)="startSet($index)">
+            {{ $index * 10 + 1 }}〜{{ $index * 10 + set.length }}問
+            @if (isSetComplete(set)) {
+              <span class="check">✓</span>
+            }
+          </button>
+        }
+      </div>
+    }
+  </main>
+} @else if (screen() === 'quiz') {
+  <main class="page quiz-page">
+    <header class="header">
+      <button type="button" class="back-btn" (click)="backToMenu()">← やめる</button>
+      <h1>{{ quizLabel }}</h1>
+      <p class="subtitle">{{ currentIndex() + 1 }} / {{ quizItems().length }}問</p>
+    </header>
+
+    @if (currentItem(); as item) {
+      <div class="quiz-card">
+        <div class="kanji-display">{{ item.kanji }}</div>
+
+        <input
+          type="text"
+          class="answer-input"
+          placeholder="よみがなを ひらがなで にゅうりょく"
+          [value]="answerInput()"
+          (input)="answerInput.set($any($event.target).value)"
+          (keydown.enter)="submitAnswer()"
+          [disabled]="feedback() !== 'none'"
+        />
+
+        @if (feedback() === 'none') {
+          <button type="button" class="submit-btn" (click)="submitAnswer()">こたえる</button>
+        } @else {
+          <div class="feedback" [class.correct]="feedback() === 'correct'" [class.wrong]="feedback() === 'wrong'">
+            {{ feedback() === 'correct' ? 'せいかい!' : 'ざんねん...' }}
+            <div class="readings">よみ方: {{ item.readings.join('、') }}</div>
+          </div>
+          <button type="button" class="submit-btn" (click)="submitAnswer()">
+            {{ currentIndex() + 1 >= quizItems().length ? 'けっかを見る' : 'つぎへ' }}
+          </button>
+        }
+      </div>
+    }
+  </main>
+} @else {
+  <main class="page">
+    <header class="header">
+      <h1>けっか</h1>
+      <p class="subtitle">{{ quizLabel }}</p>
+    </header>
+
+    <p class="score">
+      正解: {{ summaryAnswers().length - wrongInSession().length }} / {{ summaryAnswers().length }}
+    </p>
+
+    @if (wrongInSession().length > 0) {
+      <div class="wrong-list">
+        <h2>まちがえた漢字</h2>
+        @for (a of wrongInSession(); track a.kanji.kanji) {
+          <div class="wrong-item">
+            <span class="kanji-small">{{ a.kanji.kanji }}</span>
+            <span class="your-answer">あなたの答え: {{ a.userAnswer || '(未入力)' }}</span>
+            <span class="correct-answer">正しいよみ: {{ a.kanji.readings.join('、') }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="summary-actions">
+      <button type="button" class="submit-btn" (click)="retrySameSet()">もう一度この問題</button>
+      <button type="button" class="back-btn full" (click)="backToMenu()">一覧にもどる</button>
+    </div>
+  </main>
+}
