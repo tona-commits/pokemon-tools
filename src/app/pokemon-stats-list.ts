@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, output, signal } from '@angular/core';
 import { TYPE_COLOR, TYPE_LABEL } from './pokemon-types';
 import { PokemonStat, SortKey, toCsv } from './pokemon-stats';
 
@@ -8,6 +8,8 @@ import { PokemonStat, SortKey, toCsv } from './pokemon-stats';
   styleUrl: './pokemon-stats-list.scss',
 })
 export class PokemonStatsList {
+  readonly select = output<PokemonStat>();
+
   protected readonly typeLabel = TYPE_LABEL;
   protected readonly typeColor = TYPE_COLOR;
 

@@ -1,0 +1,82 @@
+<main class="page">
+  <header class="header">
+    <button type="button" class="back-btn" (click)="back.emit()">← もどる</button>
+    <h1>#{{ pokemon().dex }} {{ pokemon().name }}</h1>
+    <div class="type-row">
+      @for (t of pokemon().types; track t) {
+        <span class="badge" [style.background]="typeColor[t]">{{ typeLabel[t] }}</span>
+      }
+    </div>
+    <p class="base-stats">
+      種族値 こうげき{{ pokemon().atk }} / ぼうぎょ{{ pokemon().def }} / HP{{ pokemon().hp }}
+    </p>
+  </header>
+
+  <section class="iv-section">
+    <h2>個体値(IV)</h2>
+
+    <div class="iv-row">
+      <span class="iv-label">こうげき: {{ ivAtk() }}</span>
+      <div class="iv-grid">
+        @for (v of ivRange; track v) {
+          <button type="button" class="iv-btn" [class.selected]="ivAtk() === v" (click)="ivAtk.set(v)">
+            {{ v }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="iv-row">
+      <span class="iv-label">ぼうぎょ: {{ ivDef() }}</span>
+      <div class="iv-grid">
+        @for (v of ivRange; track v) {
+          <button type="button" class="iv-btn" [class.selected]="ivDef() === v" (click)="ivDef.set(v)">
+            {{ v }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="iv-row">
+      <span class="iv-label">HP: {{ ivHp() }}</span>
+      <div class="iv-grid">
+        @for (v of ivRange; track v) {
+          <button type="button" class="iv-btn" [class.selected]="ivHp() === v" (click)="ivHp.set(v)">
+            {{ v }}
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="result-section">
+    <h2>スーパーリーグ(CP{{ cpCap }}未満)</h2>
+
+    @if (result(); as r) {
+      <div class="result-card">
+        <div class="result-row main">
+          <span class="result-label">レベル</span>
+          <span class="result-value">{{ r.level }}</span>
+        </div>
+        <div class="result-row main">
+          <span class="result-label">CP</span>
+          <span class="result-value">{{ r.cp }}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">こうげき</span>
+          <span class="result-value">{{ r.atk | number: '1.2-2' }}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">ぼうぎょ</span>
+          <span class="result-value">{{ r.def | number: '1.2-2' }}</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">HP</span>
+          <span class="result-value">{{ r.hp }}</span>
+        </div>
+      </div>
+    } @else {
+      <p class="no-result">どのレベルでもCPが{{ cpCap }}を超えるため、スーパーリーグでは使用できません。</p>
+    }
+  </section>
+</main>

@@ -1,6 +1,8 @@
 import { Component, computed, signal, output } from '@angular/core';
 import { calcEffectiveness, TYPE_COLOR, TYPE_LABEL, TYPES, TypeInfo, TypeName } from './pokemon-types';
 import { PokemonStatsList } from './pokemon-stats-list';
+import { PokemonDetail } from './pokemon-detail';
+import { PokemonStat } from './pokemon-stats';
 
 interface EffectivenessGroup {
   multiplier: number;
@@ -14,7 +16,7 @@ const MAX_SELECTED = 2;
 
 @Component({
   selector: 'app-pokemon-feature',
-  imports: [PokemonStatsList],
+  imports: [PokemonStatsList, PokemonDetail],
   templateUrl: './pokemon-feature.html',
   styleUrl: './pokemon-feature.scss',
 })
@@ -26,6 +28,7 @@ export class PokemonFeature {
   protected readonly typeColor = TYPE_COLOR;
 
   protected readonly activeTab = signal<Tab>('compat');
+  protected readonly selectedPokemon = signal<PokemonStat | null>(null);
 
   protected readonly selectedTypes = signal<TypeName[]>(['fire']);
 
@@ -91,5 +94,14 @@ export class PokemonFeature {
 
   protected setTab(tab: Tab): void {
     this.activeTab.set(tab);
+    this.selectedPokemon.set(null);
+  }
+
+  protected openDetail(pokemon: PokemonStat): void {
+    this.selectedPokemon.set(pokemon);
+  }
+
+  protected closeDetail(): void {
+    this.selectedPokemon.set(null);
   }
 }
