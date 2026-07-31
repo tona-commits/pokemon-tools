@@ -37,6 +37,7 @@
           <th class="sortable" (click)="setSort('atk')">こうげき</th>
           <th class="sortable" (click)="setSort('def')">ぼうぎょ</th>
           <th class="sortable" (click)="setSort('hp')">HP</th>
+          <th class="sortable" (click)="setSort('glCp')">スーパーリーグ(IV15/15/15)</th>
         </tr>
       </thead>
       <tbody>
@@ -52,6 +53,14 @@
             <td>{{ p.atk }}</td>
             <td>{{ p.def }}</td>
             <td>{{ p.hp }}</td>
+            <td class="gl-cell">
+              @if (p.gl; as gl) {
+                <div class="gl-cp">CP{{ gl.cp }}(Lv{{ gl.level }})</div>
+                <div class="gl-stats">攻{{ gl.atk | number: '1.0-0' }} 防{{ gl.def | number: '1.0-0' }} HP{{ gl.hp }}</div>
+              } @else {
+                <span class="gl-none">対象外</span>
+              }
+            </td>
           </tr>
         }
       </tbody>

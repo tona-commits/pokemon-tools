@@ -1,9 +1,18 @@
 import { Component, computed, output, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { TYPE_COLOR, TYPE_LABEL } from './pokemon-types';
 import { PokemonStat, SortKey, toCsv } from './pokemon-stats';
+import { findMaxLevelUnderCp, LeagueStatsResult } from './cp-calculator';
+
+const GL_DEFAULT_IV = 15;
+
+export interface PokemonStatWithGL extends PokemonStat {
+  gl: LeagueStatsResult | null;
+}
 
 @Component({
   selector: 'app-pokemon-stats-list',
+  imports: [DecimalPipe],
   templateUrl: './pokemon-stats-list.html',
   styleUrl: './pokemon-stats-list.scss',
 })
@@ -22,12 +31,20 @@ export class PokemonStatsList {
   protected readonly sortKey = signal<SortKey>('dex');
   protected readonly sortDesc = signal(false);
 
-  protected readonly filteredSorted = computed<PokemonStat[]>(() => {
+  // 全種族分のスーパーリーグ(IV15/15/15固定)を一度だけ計算しておく
+  protected readonly statsWithGL = computed<PokemonStatWithGL[]>(() =>
+    this.allStats().map((p) => ({
+      ...p,
+      gl: findMaxLevelUnderCp(p.atk, p.def, p.hp, GL_DEFAULT_IV, GL_DEFAULT_IV, GL_DEFAULT_IV),
+    })),
+  );
+
+  protected readonly filteredSorted = computed<PokemonStatWithGL[]>(() => {
     const term = this.searchTerm().trim();
     const key = this.sortKey();
     const desc = this.sortDesc();
 
-    let rows = this.allStats();
+    let rows = this.statsWithGL();
     if (term) {
       const digitTerm = term.replace(/^#/, '');
       const matched = rows.filter(
@@ -41,7 +58,9 @@ export class PokemonStatsList {
       }
     }
 
-    return [...rows].sort((a, b) => (desc ? b[key] - a[key] : a[key] - b[key]));
+    const valueFor = (r: PokemonStatWithGL): number => (key === 'glCp' ? (r.gl?.cp ?? -1) : r[key]);
+
+    return [...rows].sort((a, b) => (desc ? valueFor(b) - valueFor(a) : valueFor(a) - valueFor(b)));
   });
 
   constructor() {

@@ -11,7 +11,7 @@ export interface PokemonStat {
   familyId: string;
 }
 
-export type SortKey = 'dex' | 'atk' | 'def' | 'hp';
+export type SortKey = 'dex' | 'atk' | 'def' | 'hp' | 'glCp';
 
 export function toCsv(rows: PokemonStat[], typeLabel: Record<TypeName, string>): string {
   const header = ['図鑑番号', '名前', 'タイプ1', 'タイプ2', 'こうげき', 'ぼうぎょ', 'HP'];
