@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { PokemonFeature } from './pokemon-feature';
 import { KanjiFeature } from './kanji-feature';
 
-type Screen = 'home' | 'pokemon' | 'kanji';
+type Screen = 'home' | 'pokemon' | 'kanji' | 'practice';
 
 @Component({
   selector: 'app-root',
