@@ -50,7 +50,15 @@
   </section>
 
   <section class="result-section">
-    <h2>スーパーリーグ(CP{{ cpCap }}未満)</h2>
+    <div class="league-select">
+      <button type="button" class="league-tab" [class.active]="league() === 'great'" (click)="league.set('great')">
+        スーパーリーグ
+      </button>
+      <button type="button" class="league-tab" [class.active]="league() === 'hyper'" (click)="league.set('hyper')">
+        ハイパーリーグ
+      </button>
+    </div>
+    <h2>CP{{ cpCap() }}未満</h2>
 
     @if (result(); as r) {
       <div class="result-card">
@@ -76,7 +84,7 @@
         </div>
       </div>
     } @else {
-      <p class="no-result">どのレベルでもCPが{{ cpCap }}を超えるため、スーパーリーグでは使用できません。</p>
+      <p class="no-result">どのレベルでもCPが{{ cpCap() }}を超えるため、このリーグでは使用できません。</p>
     }
   </section>
 </main>

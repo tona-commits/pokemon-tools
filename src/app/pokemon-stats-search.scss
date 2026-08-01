@@ -16,7 +16,8 @@
   margin-bottom: 12px;
 }
 
-.family-toggle {
+.family-toggle,
+.gray-toggle {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -29,7 +30,17 @@
   }
 }
 
-.league-btn {
+.gray-toggle {
+  margin-bottom: 12px;
+}
+
+.league-select {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.league-tab {
   padding: 6px 14px;
   border-radius: 999px;
   border: 1px solid #4a90d9;
@@ -107,6 +118,10 @@ thead th {
   }
 }
 
+tr.low-cp td {
+  color: #aaa;
+}
+
 .name-link {
   padding: 0;
   border: none;
@@ -116,6 +131,10 @@ thead th {
   font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
+
+  tr.low-cp & {
+    color: #9ab8d9;
+  }
 
   &:hover {
     color: #14459e;
@@ -138,27 +157,7 @@ thead th {
   white-space: nowrap;
 }
 
-.league-cell {
-  line-height: 1.4;
-}
-
-.league-cp {
-  font-weight: 600;
-}
-
-.league-stats {
-  font-size: 0.75rem;
-  color: #666;
-}
-
 .league-none {
   color: #999;
   font-size: 0.8rem;
-}
-
-.league-cell.low-cp {
-  .league-cp,
-  .league-stats {
-    color: #aaa;
-  }
 }

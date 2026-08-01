@@ -1,0 +1,102 @@
+<div class="toolbar">
+  <input
+    type="search"
+    class="search-input"
+    placeholder="名前 または 図鑑番号で検索"
+    [value]="searchTerm()"
+    (input)="searchTerm.set($any($event.target).value)"
+  />
+</div>
+
+<div class="toggle-row">
+  <label class="family-toggle">
+    <input
+      type="checkbox"
+      [checked]="showFamily()"
+      (change)="showFamily.set($any($event.target).checked)"
+    />
+    進化系もまとめて表示
+  </label>
+</div>
+
+<div class="league-select">
+  <button type="button" class="league-tab" [class.active]="league() === 'none'" (click)="setLeague('none')">
+    種族値
+  </button>
+  <button type="button" class="league-tab" [class.active]="league() === 'great'" (click)="setLeague('great')">
+    スーパーリーグ
+  </button>
+  <button type="button" class="league-tab" [class.active]="league() === 'hyper'" (click)="setLeague('hyper')">
+    ハイパーリーグ
+  </button>
+</div>
+
+@if (league() !== 'none') {
+  <label class="gray-toggle">
+    <input
+      type="checkbox"
+      [checked]="hideGray()"
+      (change)="hideGray.set($any($event.target).checked)"
+    />
+    しきい値未満(グレー)を非表示
+  </label>
+}
+
+@if (loading()) {
+  <p class="status">読み込み中...</p>
+} @else if (loadError()) {
+  <p class="status error">データの読み込みに失敗しました。</p>
+} @else {
+  <p class="status count">{{ filteredSorted().length }}匹表示中</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="sortable" (click)="setSort('dex')">図鑑番号</th>
+          <th>名前</th>
+          <th>タイプ</th>
+          @if (league() !== 'none') {
+            <th>CP(Lv)</th>
+          }
+          <th class="sortable" (click)="setSort('atk')">こうげき</th>
+          <th class="sortable" (click)="setSort('def')">ぼうぎょ</th>
+          <th class="sortable" (click)="setSort('hp')">HP</th>
+          <th class="sortable" (click)="setSort('total')">総合</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of filteredSorted(); track r.stat.speciesId) {
+          <tr [class.low-cp]="r.isGray">
+            <td>#{{ r.stat.dex }}</td>
+            <td><button type="button" class="name-link" (click)="select.emit(r.stat)">{{ r.stat.name }}</button></td>
+            <td class="type-cell">
+              @for (t of r.stat.types; track t) {
+                <span class="badge" [style.background]="typeColor[t]">{{ typeLabel[t] }}</span>
+              }
+            </td>
+            @if (league() !== 'none') {
+              <td>
+                @if (r.cp !== null) {
+                  CP{{ r.cp }}(Lv{{ r.level }})
+                } @else {
+                  <span class="league-none">-</span>
+                }
+              </td>
+            }
+            @if (league() === 'none') {
+              <td>{{ r.atk }}</td>
+              <td>{{ r.def }}</td>
+              <td>{{ r.hp }}</td>
+            } @else {
+              <td>{{ r.atk | number: '1.0-0' }}</td>
+              <td>{{ r.def | number: '1.0-0' }}</td>
+              <td>{{ r.hp }}</td>
+            }
+            <td>{{ r.total | number: '1.0-0' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

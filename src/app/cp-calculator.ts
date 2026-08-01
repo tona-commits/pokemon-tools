@@ -14,6 +14,7 @@ const CPM: number[] = [
 ];
 
 export const GREAT_LEAGUE_CP_CAP = 1500;
+export const HYPER_LEAGUE_CP_CAP = 2500;
 
 export interface LeagueStatsResult {
   level: number;

@@ -6,19 +6,25 @@
     [value]="searchTerm()"
     (input)="searchTerm.set($any($event.target).value)"
   />
-  <button type="button" class="csv-btn" (click)="downloadCsv()" [disabled]="loading() || loadError()">
-    CSVダウンロード
-  </button>
 </div>
 
-<label class="family-toggle">
-  <input
-    type="checkbox"
-    [checked]="showFamily()"
-    (change)="showFamily.set($any($event.target).checked)"
-  />
-  進化系もまとめて表示
-</label>
+<div class="toggle-row">
+  <label class="family-toggle">
+    <input
+      type="checkbox"
+      [checked]="showFamily()"
+      (change)="showFamily.set($any($event.target).checked)"
+    />
+    進化系もまとめて表示
+  </label>
+
+  <button type="button" class="league-btn" [class.active]="showGreatLeague()" (click)="toggleGreatLeague()">
+    スーパーリーグ
+  </button>
+  <button type="button" class="league-btn" [class.active]="showHyperLeague()" (click)="toggleHyperLeague()">
+    ハイパーリーグ
+  </button>
+</div>
 
 @if (loading()) {
   <p class="status">読み込み中...</p>
@@ -34,10 +40,17 @@
           <th class="sortable" (click)="setSort('dex')">図鑑番号</th>
           <th>名前</th>
           <th>タイプ</th>
-          <th class="sortable" (click)="setSort('atk')">こうげき</th>
-          <th class="sortable" (click)="setSort('def')">ぼうぎょ</th>
-          <th class="sortable" (click)="setSort('hp')">HP</th>
-          <th class="sortable" (click)="setSort('glCp')">スーパーリーグ(IV15/15/15)</th>
+          @if (!showGreatLeague() && !showHyperLeague()) {
+            <th class="sortable" (click)="setSort('atk')">こうげき</th>
+            <th class="sortable" (click)="setSort('def')">ぼうぎょ</th>
+            <th class="sortable" (click)="setSort('hp')">HP</th>
+          }
+          @if (showGreatLeague()) {
+            <th class="sortable" (click)="setSort('glCp')">スーパーリーグ(IV15/15/15)</th>
+          }
+          @if (showHyperLeague()) {
+            <th class="sortable" (click)="setSort('hlCp')">ハイパーリーグ(IV15/15/15)</th>
+          }
         </tr>
       </thead>
       <tbody>
@@ -50,17 +63,31 @@
                 <span class="badge" [style.background]="typeColor[t]">{{ typeLabel[t] }}</span>
               }
             </td>
-            <td>{{ p.atk }}</td>
-            <td>{{ p.def }}</td>
-            <td>{{ p.hp }}</td>
-            <td class="gl-cell">
-              @if (p.gl; as gl) {
-                <div class="gl-cp">CP{{ gl.cp }}(Lv{{ gl.level }})</div>
-                <div class="gl-stats">攻{{ gl.atk | number: '1.0-0' }} 防{{ gl.def | number: '1.0-0' }} HP{{ gl.hp }}</div>
-              } @else {
-                <span class="gl-none">対象外</span>
-              }
-            </td>
+            @if (!showGreatLeague() && !showHyperLeague()) {
+              <td>{{ p.atk }}</td>
+              <td>{{ p.def }}</td>
+              <td>{{ p.hp }}</td>
+            }
+            @if (showGreatLeague()) {
+              <td class="league-cell" [class.low-cp]="greatLeague()[p.speciesId] && greatLeague()[p.speciesId].cp < greatLeagueGrayCp">
+                @if (greatLeague()[p.speciesId]; as gl) {
+                  <div class="league-cp">CP{{ gl.cp }}(Lv{{ gl.level }})</div>
+                  <div class="league-stats">攻{{ gl.atk | number: '1.0-0' }} 防{{ gl.def | number: '1.0-0' }} HP{{ gl.hp }}</div>
+                } @else {
+                  <span class="league-none">-</span>
+                }
+              </td>
+            }
+            @if (showHyperLeague()) {
+              <td class="league-cell" [class.low-cp]="hyperLeague()[p.speciesId] && hyperLeague()[p.speciesId].cp < hyperLeagueGrayCp">
+                @if (hyperLeague()[p.speciesId]; as hl) {
+                  <div class="league-cp">CP{{ hl.cp }}(Lv{{ hl.level }})</div>
+                  <div class="league-stats">攻{{ hl.atk | number: '1.0-0' }} 防{{ hl.def | number: '1.0-0' }} HP{{ hl.hp }}</div>
+                } @else {
+                  <span class="league-none">-</span>
+                }
+              </td>
+            }
           </tr>
         }
       </tbody>

@@ -1,6 +1,7 @@
 import { Component, computed, signal, output } from '@angular/core';
 import { calcEffectiveness, TYPE_COLOR, TYPE_LABEL, TYPES, TypeInfo, TypeName } from './pokemon-types';
 import { PokemonStatsList } from './pokemon-stats-list';
+import { PokemonStatsSearch } from './pokemon-stats-search';
 import { PokemonDetail } from './pokemon-detail';
 import { PokemonStat } from './pokemon-stats';
 
@@ -10,13 +11,13 @@ interface EffectivenessGroup {
   types: TypeInfo[];
 }
 
-type Tab = 'compat' | 'stats';
+type Tab = 'compat' | 'stats' | 'search';
 
 const MAX_SELECTED = 2;
 
 @Component({
   selector: 'app-pokemon-feature',
-  imports: [PokemonStatsList, PokemonDetail],
+  imports: [PokemonStatsList, PokemonStatsSearch, PokemonDetail],
   templateUrl: './pokemon-feature.html',
   styleUrl: './pokemon-feature.scss',
 })

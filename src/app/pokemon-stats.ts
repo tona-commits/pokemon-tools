@@ -11,22 +11,17 @@ export interface PokemonStat {
   familyId: string;
 }
 
-export type SortKey = 'dex' | 'atk' | 'def' | 'hp' | 'glCp';
-
-export function toCsv(rows: PokemonStat[], typeLabel: Record<TypeName, string>): string {
-  const header = ['図鑑番号', '名前', 'タイプ1', 'タイプ2', 'こうげき', 'ぼうぎょ', 'HP'];
-  const lines = rows.map((r) =>
-    [
-      r.dex,
-      r.name,
-      typeLabel[r.types[0]] ?? '',
-      r.types[1] ? (typeLabel[r.types[1]] ?? '') : '',
-      r.atk,
-      r.def,
-      r.hp,
-    ].join(','),
-  );
-  // Excelで文字化けしないようUTF-8 BOMを付与する
-  const bom = String.fromCharCode(0xfeff);
-  return bom + [header.join(','), ...lines].join('\n');
+export interface LeagueEntry {
+  speciesId: string;
+  level: number;
+  cp: number;
+  atk: number;
+  def: number;
+  hp: number;
 }
+
+export type SortKey = 'dex' | 'atk' | 'def' | 'hp' | 'glCp' | 'hlCp';
+
+// リーグとして実用的とみなすCPのしきい値。これ未満はグレー表示にする
+export const GREAT_LEAGUE_GRAY_CP = 1400;
+export const HYPER_LEAGUE_GRAY_CP = 2300;

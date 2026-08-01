@@ -1,14 +1,13 @@
 import { Component, computed, output, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { TYPE_COLOR, TYPE_LABEL } from './pokemon-types';
-import { PokemonStat, SortKey, toCsv } from './pokemon-stats';
-import { findMaxLevelUnderCp, LeagueStatsResult } from './cp-calculator';
-
-const GL_DEFAULT_IV = 15;
-
-export interface PokemonStatWithGL extends PokemonStat {
-  gl: LeagueStatsResult | null;
-}
+import {
+  GREAT_LEAGUE_GRAY_CP,
+  HYPER_LEAGUE_GRAY_CP,
+  LeagueEntry,
+  PokemonStat,
+  SortKey,
+} from './pokemon-stats';
 
 @Component({
   selector: 'app-pokemon-stats-list',
@@ -21,30 +20,29 @@ export class PokemonStatsList {
 
   protected readonly typeLabel = TYPE_LABEL;
   protected readonly typeColor = TYPE_COLOR;
+  protected readonly greatLeagueGrayCp = GREAT_LEAGUE_GRAY_CP;
+  protected readonly hyperLeagueGrayCp = HYPER_LEAGUE_GRAY_CP;
 
   protected readonly allStats = signal<PokemonStat[]>([]);
   protected readonly loading = signal(true);
   protected readonly loadError = signal(false);
+
+  protected readonly greatLeague = signal<Record<string, LeagueEntry>>({});
+  protected readonly hyperLeague = signal<Record<string, LeagueEntry>>({});
+  protected readonly showGreatLeague = signal(false);
+  protected readonly showHyperLeague = signal(false);
 
   protected readonly searchTerm = signal('');
   protected readonly showFamily = signal(true);
   protected readonly sortKey = signal<SortKey>('dex');
   protected readonly sortDesc = signal(false);
 
-  // 全種族分のスーパーリーグ(IV15/15/15固定)を一度だけ計算しておく
-  protected readonly statsWithGL = computed<PokemonStatWithGL[]>(() =>
-    this.allStats().map((p) => ({
-      ...p,
-      gl: findMaxLevelUnderCp(p.atk, p.def, p.hp, GL_DEFAULT_IV, GL_DEFAULT_IV, GL_DEFAULT_IV),
-    })),
-  );
-
-  protected readonly filteredSorted = computed<PokemonStatWithGL[]>(() => {
+  protected readonly filteredSorted = computed<PokemonStat[]>(() => {
     const term = this.searchTerm().trim();
     const key = this.sortKey();
     const desc = this.sortDesc();
 
-    let rows = this.statsWithGL();
+    let rows = this.allStats();
     if (term) {
       const digitTerm = term.replace(/^#/, '');
       const matched = rows.filter(
@@ -58,7 +56,11 @@ export class PokemonStatsList {
       }
     }
 
-    const valueFor = (r: PokemonStatWithGL): number => (key === 'glCp' ? (r.gl?.cp ?? -1) : r[key]);
+    const valueFor = (r: PokemonStat): number => {
+      if (key === 'glCp') return this.greatLeague()[r.speciesId]?.cp ?? -1;
+      if (key === 'hlCp') return this.hyperLeague()[r.speciesId]?.cp ?? -1;
+      return r[key];
+    };
 
     return [...rows].sort((a, b) => (desc ? valueFor(b) - valueFor(a) : valueFor(a) - valueFor(b)));
   });
@@ -83,14 +85,33 @@ export class PokemonStatsList {
     }
   }
 
-  protected downloadCsv(): void {
-    const csv = toCsv(this.filteredSorted(), this.typeLabel);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'pokemon-go-stats.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+  protected toggleGreatLeague(): void {
+    if (!this.showGreatLeague() && Object.keys(this.greatLeague()).length === 0) {
+      this.loadLeague('pokemon-go-great-league.json', this.greatLeague);
+    }
+    this.showGreatLeague.set(!this.showGreatLeague());
+  }
+
+  protected toggleHyperLeague(): void {
+    if (!this.showHyperLeague() && Object.keys(this.hyperLeague()).length === 0) {
+      this.loadLeague('pokemon-go-hyper-league.json', this.hyperLeague);
+    }
+    this.showHyperLeague.set(!this.showHyperLeague());
+  }
+
+  private loadLeague(path: string, target: typeof this.greatLeague): void {
+    fetch(path)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data: LeagueEntry[]) => {
+        const map: Record<string, LeagueEntry> = {};
+        for (const entry of data) map[entry.speciesId] = entry;
+        target.set(map);
+      })
+      .catch(() => {
+        // 読み込み失敗時はそのタイプの列を空のまま表示する
+      });
   }
 }

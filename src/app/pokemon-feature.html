@@ -15,6 +15,9 @@
       <button type="button" [class.active]="activeTab() === 'stats'" (click)="setTab('stats')">
         種族値一覧
       </button>
+      <button type="button" [class.active]="activeTab() === 'search'" (click)="setTab('search')">
+        種族値検索
+      </button>
     </nav>
 
     @if (activeTab() === 'compat') {
@@ -64,8 +67,10 @@
           </div>
         }
       </section>
-    } @else {
+    } @else if (activeTab() === 'stats') {
       <app-pokemon-stats-list (select)="openDetail($event)" />
+    } @else {
+      <app-pokemon-stats-search (select)="openDetail($event)" />
     }
   </main>
 }
