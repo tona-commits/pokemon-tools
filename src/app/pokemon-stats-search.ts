@@ -1,6 +1,6 @@
 import { Component, computed, output, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { TYPE_COLOR, TYPE_LABEL } from './pokemon-types';
+import { TYPE_COLOR, TYPE_LABEL, TYPES, TypeName } from './pokemon-types';
 import {
   GREAT_LEAGUE_GRAY_CP,
   HYPER_LEAGUE_GRAY_CP,
@@ -31,6 +31,7 @@ interface DisplayRow {
 export class PokemonStatsSearch {
   readonly select = output<PokemonStat>();
 
+  protected readonly types = TYPES;
   protected readonly typeLabel = TYPE_LABEL;
   protected readonly typeColor = TYPE_COLOR;
 
@@ -44,9 +45,12 @@ export class PokemonStatsSearch {
 
   protected readonly searchTerm = signal('');
   protected readonly showFamily = signal(true);
-  protected readonly hideGray = signal(false);
+  protected readonly hideGray = signal(true);
   protected readonly sortKey = signal<SearchSortKey>('dex');
   protected readonly sortDesc = signal(false);
+
+  protected readonly showTypeFilter = signal(false);
+  protected readonly typeFilter = signal<TypeName[]>([]);
 
   private readonly grayThreshold = computed(() =>
     this.league() === 'great' ? GREAT_LEAGUE_GRAY_CP : HYPER_LEAGUE_GRAY_CP,
@@ -94,8 +98,13 @@ export class PokemonStatsSearch {
     const desc = this.sortDesc();
     const league = this.league();
     const hideGray = this.hideGray();
+    const types = this.typeFilter();
 
     let rows = this.rows();
+
+    if (types.length > 0) {
+      rows = rows.filter((r) => r.stat.types.some((t) => types.includes(t)));
+    }
 
     if (term) {
       const digitTerm = term.replace(/^#/, '');
@@ -134,6 +143,17 @@ export class PokemonStatsSearch {
       .then((data: PokemonStat[]) => this.allStats.set(data))
       .catch(() => this.loadError.set(true))
       .finally(() => this.loading.set(false));
+  }
+
+  protected toggleType(name: TypeName): void {
+    const current = this.typeFilter();
+    this.typeFilter.set(
+      current.includes(name) ? current.filter((t) => t !== name) : [...current, name],
+    );
+  }
+
+  protected clearTypeFilter(): void {
+    this.typeFilter.set([]);
   }
 
   protected setLeague(league: League): void {

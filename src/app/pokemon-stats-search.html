@@ -19,6 +19,36 @@
   </label>
 </div>
 
+<div class="type-filter-section">
+  <button type="button" class="type-filter-toggle" (click)="showTypeFilter.set(!showTypeFilter())">
+    タイプで絞り込む
+    @if (typeFilter().length > 0) {
+      <span class="filter-count">({{ typeFilter().length }})</span>
+    }
+    <span class="chevron">{{ showTypeFilter() ? '▲' : '▼' }}</span>
+  </button>
+
+  @if (showTypeFilter()) {
+    <div class="type-grid">
+      @for (t of types; track t.name) {
+        <button
+          type="button"
+          class="type-btn"
+          [class.selected]="typeFilter().includes(t.name)"
+          [style.background]="t.color"
+          [style.--type-color]="t.color"
+          (click)="toggleType(t.name)"
+        >
+          {{ t.label }}
+        </button>
+      }
+    </div>
+    @if (typeFilter().length > 0) {
+      <button type="button" class="clear-type-btn" (click)="clearTypeFilter()">絞り込みをクリア</button>
+    }
+  }
+</div>
+
 <div class="league-select">
   <button type="button" class="league-tab" [class.active]="league() === 'none'" (click)="setLeague('none')">
     種族値
