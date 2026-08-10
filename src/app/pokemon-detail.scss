@@ -164,3 +164,109 @@ h2 {
   color: #c03028;
   font-size: 0.9rem;
 }
+
+.move-section {
+  margin-top: 28px;
+}
+
+.status {
+  color: #666;
+  font-size: 0.85rem;
+
+  &.error {
+    color: #c03028;
+  }
+}
+
+.move-group-label {
+  font-size: 0.8rem;
+  color: #888;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.move-list {
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.move-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+
+  & + .move-row {
+    border-top: 1px solid #f0f0f0;
+  }
+}
+
+.move-type {
+  flex-shrink: 0;
+  width: 52px;
+  text-align: center;
+  padding: 2px 0;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.move-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.move-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.move-tag {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.elite {
+    background: #fff6e5;
+    color: #a06000;
+    border: 1px solid #e0a030;
+  }
+
+  &.legacy {
+    background: #f0f0f0;
+    color: #777;
+    border: 1px solid #ccc;
+  }
+}
+
+.move-buff {
+  display: block;
+  font-size: 0.7rem;
+  color: #c03028;
+}
+
+.move-stats {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 0.75rem;
+  color: #666;
+  text-align: right;
+}
+
+.move-power {
+  font-weight: 600;
+  color: #444;
+
+  &.stab {
+    color: #c03028;
+  }
+}

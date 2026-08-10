@@ -87,4 +87,61 @@
       <p class="no-result">どのレベルでもCPが{{ cpCap() }}を超えるため、このリーグでは使用できません。</p>
     }
   </section>
+
+  <section class="move-section">
+    <h2>技一覧(GBL用)</h2>
+
+    @if (movesLoading()) {
+      <p class="status">読み込み中...</p>
+    } @else if (movesError()) {
+      <p class="status error">技データの読み込みに失敗しました。</p>
+    } @else {
+      <p class="move-group-label">ノーマルアタック</p>
+      <div class="move-list">
+        @for (m of fastMoves(); track m.id) {
+          <ng-container [ngTemplateOutlet]="moveRow" [ngTemplateOutletContext]="{ m: m }" />
+        }
+      </div>
+
+      <p class="move-group-label">スペシャルアタック</p>
+      <div class="move-list">
+        @for (m of chargedMoves(); track m.id) {
+          <ng-container [ngTemplateOutlet]="moveRow" [ngTemplateOutletContext]="{ m: m }" />
+        }
+      </div>
+    }
+  </section>
 </main>
+
+<ng-template #moveRow let-m="m">
+  <div class="move-row">
+    <span class="move-type" [style.background]="typeColorFor(m.entry.type)">{{ typeLabelFor(m.entry.type) }}</span>
+    <div class="move-main">
+      <span class="move-name">
+        {{ m.entry.name }}
+        @if (m.elite) {
+          <span class="move-tag elite">限定技</span>
+        }
+        @if (m.legacy) {
+          <span class="move-tag legacy">配布終了</span>
+        }
+      </span>
+      @if (m.entry.buff; as b) {
+        <span class="move-buff">
+          {{ b.target === 'self' ? '自分' : '相手' }}
+          @if (b.atk !== 0) { こうげき{{ b.atk > 0 ? '+' : '' }}{{ b.atk }} }
+          @if (b.def !== 0) { ぼうぎょ{{ b.def > 0 ? '+' : '' }}{{ b.def }} }
+          ({{ b.chance * 100 }}%)
+        </span>
+      }
+    </div>
+    <span class="move-stats">
+      <span class="move-power" [class.stab]="m.stab">威力{{ m.power | number: '1.0-2' }}</span>
+      @if (m.ept !== null) {
+        <span>DPT{{ m.dpt | number: '1.2-2' }} / EPT{{ m.ept | number: '1.2-2' }} / {{ m.entry.turns }}ターン</span>
+      } @else {
+        <span>消費{{ m.entry.energyCost }}</span>
+      }
+    </span>
+  </div>
+</ng-template>
