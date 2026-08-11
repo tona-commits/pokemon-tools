@@ -1,12 +1,13 @@
 // GBL(対人戦)で使う技データを生成する。
-// public/pokemon-go-stats.json と同じ946種(dexごとの代表フォーム)を対象に、
+// public/pokemon-go-stats.json と同じ対象種族(dexごとの代表フォーム + リージョンフォーム)について、
 // 各種族の使用可能な技(通常/げんきょう/わざレコード)一覧と、
 // 技ごとの日本語名・タイプ・威力・エネルギー・ターン数・追加効果を
 // public/pokemon-go-moves.json / public/pokemon-go-movesets.json に出力する。
 // 実行: node scripts/generate-moves-json.mjs
-import { readFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { selectRepresentatives } from './lib/species.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, '..', 'public');
@@ -67,14 +68,8 @@ async function main() {
     return name || fallbackEnName;
   }
 
-  // public/pokemon-go-stats.json と同じ選定ロジック(dexごとに released && 非shadowの最初の1体)
-  const byDex = new Map();
-  for (const mon of gm.pokemon) {
-    if (!mon.released) continue;
-    if ((mon.tags || []).includes('shadow')) continue;
-    if (!byDex.has(mon.dex)) byDex.set(mon.dex, mon);
-  }
-  const representatives = [...byDex.values()];
+  // public/pokemon-go-stats.json と同じ選定ロジック(scripts/lib/species.mjs)を使う
+  const representatives = selectRepresentatives(gm.pokemon).map((e) => e.mon);
 
   const usedMoveIds = new Set();
   for (const mon of representatives) {
