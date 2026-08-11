@@ -1,13 +1,11 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { TYPE_COLOR, TYPE_LABEL } from './pokemon-types';
-import { PokemonStat } from './pokemon-stats';
+import { League, PokemonStat } from './pokemon-stats';
 import { findMaxLevelUnderCp, GREAT_LEAGUE_CP_CAP, HYPER_LEAGUE_CP_CAP } from './cp-calculator';
 import { buildDisplayMoves, MoveEntry, MovesetEntry } from './pokemon-moves';
 
 const IV_RANGE = Array.from({ length: 16 }, (_, i) => i);
-
-type League = 'great' | 'hyper';
 
 @Component({
   selector: 'app-pokemon-detail',
@@ -17,13 +15,15 @@ type League = 'great' | 'hyper';
 })
 export class PokemonDetail {
   readonly pokemon = input.required<PokemonStat>();
+  readonly initialLeague = input<League>('great');
   readonly back = output<void>();
 
   protected readonly typeLabel = TYPE_LABEL;
   protected readonly typeColor = TYPE_COLOR;
   protected readonly ivRange = IV_RANGE;
 
-  protected readonly league = signal<League>('great');
+  private readonly leagueOverride = signal<League | null>(null);
+  protected readonly league = computed(() => this.leagueOverride() ?? this.initialLeague());
 
   protected readonly ivAtk = signal(15);
   protected readonly ivDef = signal(15);
@@ -56,6 +56,10 @@ export class PokemonDetail {
     if (!moveset) return [];
     return buildDisplayMoves(moveset.charged, this.moves(), moveset.elite, moveset.legacy, p.types);
   });
+
+  protected setLeague(league: League): void {
+    this.leagueOverride.set(league);
+  }
 
   protected typeColorFor(type: string): string {
     return this.typeColor[type as keyof typeof this.typeColor];

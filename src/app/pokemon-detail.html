@@ -51,10 +51,10 @@
 
   <section class="result-section">
     <div class="league-select">
-      <button type="button" class="league-tab" [class.active]="league() === 'great'" (click)="league.set('great')">
+      <button type="button" class="league-tab" [class.active]="league() === 'great'" (click)="setLeague('great')">
         スーパーリーグ
       </button>
-      <button type="button" class="league-tab" [class.active]="league() === 'hyper'" (click)="league.set('hyper')">
+      <button type="button" class="league-tab" [class.active]="league() === 'hyper'" (click)="setLeague('hyper')">
         ハイパーリーグ
       </button>
     </div>

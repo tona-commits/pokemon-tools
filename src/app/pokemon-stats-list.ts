@@ -5,6 +5,7 @@ import {
   GREAT_LEAGUE_GRAY_CP,
   HYPER_LEAGUE_GRAY_CP,
   LeagueEntry,
+  PokemonSelectEvent,
   PokemonStat,
   SortKey,
 } from './pokemon-stats';
@@ -16,7 +17,7 @@ import {
   styleUrl: './pokemon-stats-list.scss',
 })
 export class PokemonStatsList {
-  readonly select = output<PokemonStat>();
+  readonly select = output<PokemonSelectEvent>();
 
   protected readonly typeLabel = TYPE_LABEL;
   protected readonly typeColor = TYPE_COLOR;
@@ -74,6 +75,10 @@ export class PokemonStatsList {
       .then((data: PokemonStat[]) => this.allStats.set(data))
       .catch(() => this.loadError.set(true))
       .finally(() => this.loading.set(false));
+  }
+
+  protected onSelect(pokemon: PokemonStat): void {
+    this.select.emit({ pokemon, league: this.showHyperLeague() ? 'hyper' : 'great' });
   }
 
   protected setSort(key: SortKey): void {

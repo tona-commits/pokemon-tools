@@ -1,76 +1,80 @@
-@if (selectedPokemon(); as pokemon) {
-  <app-pokemon-detail [pokemon]="pokemon" (back)="closeDetail()" />
-} @else {
-  <main class="page">
-    <header class="header">
-      <button type="button" class="back-btn" (click)="back.emit()">← もどる</button>
-      <h1>ポケモン タイプ相性チェッカー</h1>
-      <p class="subtitle">ポケモンGO仕様のタイプ相性・種族値ツール</p>
-    </header>
+<main class="page" [hidden]="selectedPokemon() !== null">
+  <header class="header">
+    <button type="button" class="back-btn" (click)="back.emit()">← もどる</button>
+    <h1>ポケモン タイプ相性チェッカー</h1>
+    <p class="subtitle">ポケモンGO仕様のタイプ相性・種族値ツール</p>
+  </header>
 
-    <nav class="tabs" aria-label="表示切り替え">
-      <button type="button" [class.active]="activeTab() === 'compat'" (click)="setTab('compat')">
-        タイプ相性
-      </button>
-      <button type="button" [class.active]="activeTab() === 'stats'" (click)="setTab('stats')">
-        種族値一覧
-      </button>
-      <button type="button" [class.active]="activeTab() === 'search'" (click)="setTab('search')">
-        種族値検索
-      </button>
-    </nav>
+  <nav class="tabs" aria-label="表示切り替え">
+    <button type="button" [class.active]="activeTab() === 'compat'" (click)="setTab('compat')">
+      タイプ相性
+    </button>
+    <button type="button" [class.active]="activeTab() === 'stats'" (click)="setTab('stats')">
+      種族値一覧
+    </button>
+    <button type="button" [class.active]="activeTab() === 'search'" (click)="setTab('search')">
+      種族値検索
+    </button>
+  </nav>
 
-    @if (activeTab() === 'compat') {
-      <section class="selected-bar">
-        <div class="selected-badges" aria-label="選択中のタイプ">
-          @if (selectedTypeInfos().length === 0) {
-            <span class="placeholder">タイプを選んでください</span>
-          }
-          @for (t of selectedTypeInfos(); track t.name) {
-            <span class="badge" [style.background]="t.color">{{ t.label }}</span>
-          }
-        </div>
+  <div [hidden]="activeTab() !== 'compat'">
+    <section class="selected-bar">
+      <div class="selected-badges" aria-label="選択中のタイプ">
+        @if (selectedTypeInfos().length === 0) {
+          <span class="placeholder">タイプを選んでください</span>
+        }
+        @for (t of selectedTypeInfos(); track t.name) {
+          <span class="badge" [style.background]="t.color">{{ t.label }}</span>
+        }
+      </div>
+      <button
+        type="button"
+        class="clear-btn"
+        (click)="clearSelection()"
+        [disabled]="selectedTypeInfos().length === 0"
+      >
+        クリア
+      </button>
+    </section>
+
+    <section class="type-grid" aria-label="タイプを選択">
+      @for (t of types; track t.name) {
         <button
           type="button"
-          class="clear-btn"
-          (click)="clearSelection()"
-          [disabled]="selectedTypeInfos().length === 0"
+          class="type-btn"
+          [class.selected]="isSelected(t.name)"
+          [style.background]="t.color"
+          [style.--type-color]="t.color"
+          (click)="toggleType(t.name)"
         >
-          クリア
+          {{ t.label }}
         </button>
-      </section>
+      }
+    </section>
 
-      <section class="type-grid" aria-label="タイプを選択">
-        @for (t of types; track t.name) {
-          <button
-            type="button"
-            class="type-btn"
-            [class.selected]="isSelected(t.name)"
-            [style.background]="t.color"
-            [style.--type-color]="t.color"
-            (click)="toggleType(t.name)"
-          >
-            {{ t.label }}
-          </button>
-        }
-      </section>
-
-      <section class="results">
-        @for (group of groups(); track group.multiplier) {
-          <div class="result-group" [class.emphasis]="group.multiplier >= 1.6">
-            <h2 class="result-label">{{ group.label }}</h2>
-            <div class="chip-row">
-              @for (t of group.types; track t.name) {
-                <span class="badge" [style.background]="t.color">{{ t.label }}</span>
-              }
-            </div>
+    <section class="results">
+      @for (group of groups(); track group.multiplier) {
+        <div class="result-group" [class.emphasis]="group.multiplier >= 1.6">
+          <h2 class="result-label">{{ group.label }}</h2>
+          <div class="chip-row">
+            @for (t of group.types; track t.name) {
+              <span class="badge" [style.background]="t.color">{{ t.label }}</span>
+            }
           </div>
-        }
-      </section>
-    } @else if (activeTab() === 'stats') {
-      <app-pokemon-stats-list (select)="openDetail($event)" />
-    } @else {
-      <app-pokemon-stats-search (select)="openDetail($event)" />
-    }
-  </main>
+        </div>
+      }
+    </section>
+  </div>
+
+  <div [hidden]="activeTab() !== 'stats'">
+    <app-pokemon-stats-list (select)="openDetail($event)" />
+  </div>
+
+  <div [hidden]="activeTab() !== 'search'">
+    <app-pokemon-stats-search (select)="openDetail($event)" />
+  </div>
+</main>
+
+@if (selectedPokemon(); as pokemon) {
+  <app-pokemon-detail [pokemon]="pokemon" [initialLeague]="selectedLeague()" (back)="closeDetail()" />
 }

@@ -99,7 +99,7 @@
         @for (r of filteredSorted(); track r.stat.speciesId) {
           <tr [class.low-cp]="r.isGray">
             <td>#{{ r.stat.dex }}</td>
-            <td><button type="button" class="name-link" (click)="select.emit(r.stat)">{{ r.stat.name }}</button></td>
+            <td><button type="button" class="name-link" (click)="onSelect(r.stat)">{{ r.stat.name }}</button></td>
             <td class="type-cell">
               @for (t of r.stat.types; track t) {
                 <span class="badge" [style.background]="typeColor[t]">{{ typeLabel[t] }}</span>

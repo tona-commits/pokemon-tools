@@ -5,10 +5,11 @@ import {
   GREAT_LEAGUE_GRAY_CP,
   HYPER_LEAGUE_GRAY_CP,
   LeagueEntry,
+  PokemonSelectEvent,
   PokemonStat,
 } from './pokemon-stats';
 
-type League = 'none' | 'great' | 'hyper';
+type SearchLeague = 'none' | 'great' | 'hyper';
 type SearchSortKey = 'dex' | 'atk' | 'def' | 'hp' | 'total';
 
 interface DisplayRow {
@@ -29,7 +30,7 @@ interface DisplayRow {
   styleUrl: './pokemon-stats-search.scss',
 })
 export class PokemonStatsSearch {
-  readonly select = output<PokemonStat>();
+  readonly select = output<PokemonSelectEvent>();
 
   protected readonly types = TYPES;
   protected readonly typeLabel = TYPE_LABEL;
@@ -41,7 +42,7 @@ export class PokemonStatsSearch {
 
   protected readonly greatLeague = signal<Record<string, LeagueEntry>>({});
   protected readonly hyperLeague = signal<Record<string, LeagueEntry>>({});
-  protected readonly league = signal<League>('none');
+  protected readonly league = signal<SearchLeague>('none');
 
   protected readonly searchTerm = signal('');
   protected readonly showFamily = signal(true);
@@ -156,7 +157,7 @@ export class PokemonStatsSearch {
     this.typeFilter.set([]);
   }
 
-  protected setLeague(league: League): void {
+  protected setLeague(league: SearchLeague): void {
     this.league.set(league);
     if (league === 'great' && Object.keys(this.greatLeague()).length === 0) {
       this.loadLeague('pokemon-go-great-league.json', this.greatLeague);
@@ -164,6 +165,10 @@ export class PokemonStatsSearch {
     if (league === 'hyper' && Object.keys(this.hyperLeague()).length === 0) {
       this.loadLeague('pokemon-go-hyper-league.json', this.hyperLeague);
     }
+  }
+
+  protected onSelect(pokemon: PokemonStat): void {
+    this.select.emit({ pokemon, league: this.league() === 'hyper' ? 'hyper' : 'great' });
   }
 
   protected setSort(key: SearchSortKey): void {

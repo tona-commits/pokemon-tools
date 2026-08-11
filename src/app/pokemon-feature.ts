@@ -3,7 +3,7 @@ import { calcEffectiveness, TYPE_COLOR, TYPE_LABEL, TYPES, TypeInfo, TypeName } 
 import { PokemonStatsList } from './pokemon-stats-list';
 import { PokemonStatsSearch } from './pokemon-stats-search';
 import { PokemonDetail } from './pokemon-detail';
-import { PokemonStat } from './pokemon-stats';
+import { League, PokemonSelectEvent, PokemonStat } from './pokemon-stats';
 
 interface EffectivenessGroup {
   multiplier: number;
@@ -30,6 +30,7 @@ export class PokemonFeature {
 
   protected readonly activeTab = signal<Tab>('compat');
   protected readonly selectedPokemon = signal<PokemonStat | null>(null);
+  protected readonly selectedLeague = signal<League>('great');
 
   protected readonly selectedTypes = signal<TypeName[]>(['fire']);
 
@@ -98,8 +99,9 @@ export class PokemonFeature {
     this.selectedPokemon.set(null);
   }
 
-  protected openDetail(pokemon: PokemonStat): void {
-    this.selectedPokemon.set(pokemon);
+  protected openDetail(event: PokemonSelectEvent): void {
+    this.selectedPokemon.set(event.pokemon);
+    this.selectedLeague.set(event.league);
   }
 
   protected closeDetail(): void {
