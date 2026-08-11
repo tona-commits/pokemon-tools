@@ -53,6 +53,10 @@ export class PokemonStatsSearch {
   protected readonly showTypeFilter = signal(false);
   protected readonly typeFilter = signal<TypeName[]>([]);
 
+  protected readonly showMoveTypeFilter = signal(false);
+  protected readonly moveTypeFilter = signal<TypeName[]>([]);
+  private readonly moveTypesBySpecies = signal<Record<string, TypeName[]>>({});
+
   private readonly grayThreshold = computed(() =>
     this.league() === 'great' ? GREAT_LEAGUE_GRAY_CP : HYPER_LEAGUE_GRAY_CP,
   );
@@ -100,11 +104,19 @@ export class PokemonStatsSearch {
     const league = this.league();
     const hideGray = this.hideGray();
     const types = this.typeFilter();
+    const moveTypes = this.moveTypeFilter();
+    const moveTypesBySpecies = this.moveTypesBySpecies();
 
     let rows = this.rows();
 
     if (types.length > 0) {
       rows = rows.filter((r) => r.stat.types.some((t) => types.includes(t)));
+    }
+
+    if (moveTypes.length > 0) {
+      rows = rows.filter((r) =>
+        (moveTypesBySpecies[r.stat.speciesId] ?? []).some((t) => moveTypes.includes(t)),
+      );
     }
 
     if (term) {
@@ -155,6 +167,33 @@ export class PokemonStatsSearch {
 
   protected clearTypeFilter(): void {
     this.typeFilter.set([]);
+  }
+
+  protected toggleMoveTypeFilterVisible(): void {
+    const opening = !this.showMoveTypeFilter();
+    this.showMoveTypeFilter.set(opening);
+    if (opening && Object.keys(this.moveTypesBySpecies()).length === 0) {
+      fetch('pokemon-go-move-types.json')
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((data: Record<string, TypeName[]>) => this.moveTypesBySpecies.set(data))
+        .catch(() => {
+          // 読み込み失敗時は絞り込み結果が空になる(該当データなし扱い)
+        });
+    }
+  }
+
+  protected toggleMoveType(name: TypeName): void {
+    const current = this.moveTypeFilter();
+    this.moveTypeFilter.set(
+      current.includes(name) ? current.filter((t) => t !== name) : [...current, name],
+    );
+  }
+
+  protected clearMoveTypeFilter(): void {
+    this.moveTypeFilter.set([]);
   }
 
   protected setLeague(league: SearchLeague): void {

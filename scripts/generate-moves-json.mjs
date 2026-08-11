@@ -120,10 +120,27 @@ async function main() {
     movesets[mon.speciesId] = entry;
   }
 
+  // 種族値検索の「技タイプで絞り込む」用に、各種族が持つ技タイプの集合だけを
+  // 軽量な専用ファイルとして書き出す(威力やエネルギーなどは不要なため)
+  const moveTypes = {};
+  for (const [speciesId, set] of Object.entries(movesets)) {
+    const types = new Set();
+    for (const id of [...set.fast, ...set.charged]) {
+      const m = moves[id];
+      if (m) types.add(m.type);
+    }
+    moveTypes[speciesId] = [...types];
+  }
+
   writeFileSync(join(publicDir, 'pokemon-go-moves.json'), JSON.stringify(moves));
   writeFileSync(join(publicDir, 'pokemon-go-movesets.json'), JSON.stringify(movesets));
+  writeFileSync(join(publicDir, 'pokemon-go-move-types.json'), JSON.stringify(moveTypes));
 
-  console.log('moves:', Object.keys(moves).length, ' movesets:', Object.keys(movesets).length);
+  console.log(
+    'moves:', Object.keys(moves).length,
+    ' movesets:', Object.keys(movesets).length,
+    ' moveTypes:', Object.keys(moveTypes).length,
+  );
 }
 
 main();
