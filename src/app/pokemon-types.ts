@@ -161,3 +161,12 @@ export function calcEffectiveness(defendTypes: TypeName[]): Record<TypeName, num
   }
   return result;
 }
+
+/** 攻撃側の技タイプ1つに対する、全防御タイプ(単体)への倍率(ポケモンGO仕様)を計算する */
+export function calcMoveEffectiveness(attackType: TypeName): Record<TypeName, number> {
+  const result = {} as Record<TypeName, number>;
+  for (const t of TYPES) {
+    result[t.name] = TIER_MULTIPLIER[singleTier(attackType, t.name)];
+  }
+  return result;
+}

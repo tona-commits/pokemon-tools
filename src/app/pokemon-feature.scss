@@ -64,6 +64,26 @@
   }
 }
 
+.compat-mode {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.mode-radio {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: #444;
+  cursor: pointer;
+
+  input {
+    cursor: pointer;
+  }
+}
+
 .selected-bar {
   display: flex;
   align-items: center;

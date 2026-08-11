@@ -18,10 +18,23 @@
   </nav>
 
   <div [hidden]="activeTab() !== 'compat'">
+    <div class="compat-mode" role="radiogroup" aria-label="相性の向き">
+      <label class="mode-radio">
+        <input type="radio" name="compat-mode" [checked]="compatMode() === 'defense'" (change)="setCompatMode('defense')" />
+        タイプ相性
+      </label>
+      <label class="mode-radio">
+        <input type="radio" name="compat-mode" [checked]="compatMode() === 'attack'" (change)="setCompatMode('attack')" />
+        技タイプ
+      </label>
+    </div>
+
     <section class="selected-bar">
       <div class="selected-badges" aria-label="選択中のタイプ">
         @if (selectedTypeInfos().length === 0) {
-          <span class="placeholder">タイプを選んでください</span>
+          <span class="placeholder">
+            {{ compatMode() === 'attack' ? '技のタイプを選んでください' : 'タイプを選んでください' }}
+          </span>
         }
         @for (t of selectedTypeInfos(); track t.name) {
           <span class="badge" [style.background]="t.color">{{ t.label }}</span>
