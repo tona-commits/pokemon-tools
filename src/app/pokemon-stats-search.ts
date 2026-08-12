@@ -12,6 +12,8 @@ import {
 type SearchLeague = 'none' | 'great' | 'hyper';
 type SearchSortKey = 'dex' | 'atk' | 'def' | 'hp' | 'total';
 
+const MAX_TYPE_FILTER = 2;
+
 interface DisplayRow {
   stat: PokemonStat;
   atk: number;
@@ -110,7 +112,7 @@ export class PokemonStatsSearch {
     let rows = this.rows();
 
     if (types.length > 0) {
-      rows = rows.filter((r) => r.stat.types.some((t) => types.includes(t)));
+      rows = rows.filter((r) => types.every((t) => r.stat.types.includes(t)));
     }
 
     if (moveTypes.length > 0) {
@@ -160,9 +162,16 @@ export class PokemonStatsSearch {
 
   protected toggleType(name: TypeName): void {
     const current = this.typeFilter();
-    this.typeFilter.set(
-      current.includes(name) ? current.filter((t) => t !== name) : [...current, name],
-    );
+    if (current.includes(name)) {
+      this.typeFilter.set(current.filter((t) => t !== name));
+      return;
+    }
+    if (current.length < MAX_TYPE_FILTER) {
+      this.typeFilter.set([...current, name]);
+      return;
+    }
+    // 既に2つ選択済みの場合は、古い方を外して新しいタイプに差し替える
+    this.typeFilter.set([current[1], name]);
   }
 
   protected clearTypeFilter(): void {
