@@ -1,4 +1,4 @@
-import { Component, computed, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { TYPE_COLOR, TYPE_LABEL } from './pokemon-types';
 import {
@@ -18,6 +18,8 @@ import {
 })
 export class PokemonStatsList {
   readonly select = output<PokemonSelectEvent>();
+  /** 指定した場合、一覧をこの種族IDの集合だけに絞り込む(例: 技検索からの遷移) */
+  readonly restrictToSpeciesIds = input<ReadonlySet<string> | null>(null);
 
   protected readonly typeLabel = TYPE_LABEL;
   protected readonly typeColor = TYPE_COLOR;
@@ -38,12 +40,18 @@ export class PokemonStatsList {
   protected readonly sortKey = signal<SortKey>('dex');
   protected readonly sortDesc = signal(false);
 
+  private readonly baseStats = computed<PokemonStat[]>(() => {
+    const restrict = this.restrictToSpeciesIds();
+    const all = this.allStats();
+    return restrict ? all.filter((r) => restrict.has(r.speciesId)) : all;
+  });
+
   protected readonly filteredSorted = computed<PokemonStat[]>(() => {
     const term = this.searchTerm().trim();
     const key = this.sortKey();
     const desc = this.sortDesc();
 
-    let rows = this.allStats();
+    let rows = this.baseStats();
     if (term) {
       const digitTerm = term.replace(/^#/, '');
       const matched = rows.filter(

@@ -1,0 +1,65 @@
+@if (selectedMove(); as move) {
+  <div class="move-header">
+    <button type="button" class="back-btn" (click)="backToMoveList()">← 技一覧にもどる</button>
+    <div class="move-title">
+      <span class="move-type" [style.background]="typeColor[move.entry.type]">{{ typeLabel[move.entry.type] }}</span>
+      <span class="move-name">{{ move.entry.name }}</span>
+      <span class="move-category">{{ move.category === 'fast' ? 'ノーマルアタック' : 'スペシャルアタック' }}</span>
+    </div>
+    <p class="species-count">この技を覚えるポケモン: {{ speciesIdsForSelectedMove()?.size ?? 0 }}匹</p>
+  </div>
+
+  <app-pokemon-stats-list
+    [restrictToSpeciesIds]="speciesIdsForSelectedMove()"
+    (select)="select.emit($event)"
+  />
+} @else {
+  <div class="toolbar">
+    <input
+      type="search"
+      class="search-input"
+      placeholder="技名で検索"
+      [value]="searchTerm()"
+      (input)="searchTerm.set($any($event.target).value)"
+    />
+  </div>
+
+  <div class="type-filter-row">
+    @for (t of types; track t.name) {
+      <button
+        type="button"
+        class="type-btn"
+        [class.selected]="typeFilter() === t.name"
+        [style.background]="t.color"
+        [style.--type-color]="t.color"
+        (click)="setTypeFilter(t.name)"
+      >
+        {{ t.label }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <p class="status">読み込み中...</p>
+  } @else if (loadError()) {
+    <p class="status error">データの読み込みに失敗しました。</p>
+  } @else {
+    <p class="status count">{{ moveList().length }}件表示中</p>
+
+    <div class="move-list">
+      @for (m of moveList(); track m.id) {
+        <button type="button" class="move-row" (click)="selectMove(m.id)">
+          <span class="move-type" [style.background]="typeColor[m.entry.type]">{{ typeLabel[m.entry.type] }}</span>
+          <div class="move-main">
+            <span class="move-name">{{ m.entry.name }}</span>
+            <span class="move-category">{{ m.category === 'fast' ? 'ノーマルアタック' : 'スペシャルアタック' }}</span>
+          </div>
+          <span class="move-stats">
+            威力{{ m.entry.power }} /
+            {{ m.category === 'fast' ? '獲得' + m.entry.energyGain : '消費' + m.entry.energyCost }}
+          </span>
+        </button>
+      }
+    </div>
+  }
+}

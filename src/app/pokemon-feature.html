@@ -15,6 +15,9 @@
     <button type="button" [class.active]="activeTab() === 'search'" (click)="setTab('search')">
       種族値検索
     </button>
+    <button type="button" [class.active]="activeTab() === 'moves'" (click)="setTab('moves')">
+      技検索
+    </button>
   </nav>
 
   <div [hidden]="activeTab() !== 'compat'">
@@ -85,6 +88,10 @@
 
   <div [hidden]="activeTab() !== 'search'">
     <app-pokemon-stats-search (select)="openDetail($event)" />
+  </div>
+
+  <div [hidden]="activeTab() !== 'moves'">
+    <app-pokemon-move-search (select)="openDetail($event)" />
   </div>
 </main>
 

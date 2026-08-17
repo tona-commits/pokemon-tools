@@ -10,6 +10,7 @@ import {
 } from './pokemon-types';
 import { PokemonStatsList } from './pokemon-stats-list';
 import { PokemonStatsSearch } from './pokemon-stats-search';
+import { PokemonMoveSearch } from './pokemon-move-search';
 import { PokemonDetail } from './pokemon-detail';
 import { League, PokemonSelectEvent, PokemonStat } from './pokemon-stats';
 
@@ -19,7 +20,7 @@ interface EffectivenessGroup {
   types: TypeInfo[];
 }
 
-type Tab = 'compat' | 'stats' | 'search';
+type Tab = 'compat' | 'stats' | 'search' | 'moves';
 type CompatMode = 'defense' | 'attack';
 
 const MAX_SELECTED = 2;
@@ -56,7 +57,7 @@ function toGroups(effectiveness: Record<TypeName, number>, types: TypeInfo[]): E
 
 @Component({
   selector: 'app-pokemon-feature',
-  imports: [PokemonStatsList, PokemonStatsSearch, PokemonDetail],
+  imports: [PokemonStatsList, PokemonStatsSearch, PokemonMoveSearch, PokemonDetail],
   templateUrl: './pokemon-feature.html',
   styleUrl: './pokemon-feature.scss',
 })
