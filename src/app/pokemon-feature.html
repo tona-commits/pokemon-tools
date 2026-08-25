@@ -18,6 +18,9 @@
     <button type="button" [class.active]="activeTab() === 'moves'" (click)="setTab('moves')">
       技検索
     </button>
+    <button type="button" [class.active]="activeTab() === 'compare'" (click)="setTab('compare')">
+      比較
+    </button>
   </nav>
 
   <div [hidden]="activeTab() !== 'compat'">
@@ -92,6 +95,10 @@
 
   <div [hidden]="activeTab() !== 'moves'">
     <app-pokemon-move-search (select)="openDetail($event)" />
+  </div>
+
+  <div [hidden]="activeTab() !== 'compare'">
+    <app-pokemon-compare />
   </div>
 </main>
 

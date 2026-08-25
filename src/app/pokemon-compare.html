@@ -1,0 +1,148 @@
+@if (screen() === 'select') {
+  <div class="toolbar">
+    <input
+      type="search"
+      class="search-input"
+      placeholder="名前 または 図鑑番号で検索"
+      [value]="searchTerm()"
+      (input)="searchTerm.set($any($event.target).value)"
+    />
+  </div>
+
+  <div class="toggle-row">
+    <label class="family-toggle">
+      <input
+        type="checkbox"
+        [checked]="showFamily()"
+        (change)="showFamily.set($any($event.target).checked)"
+      />
+      進化系もまとめて表示
+    </label>
+  </div>
+
+  <div class="league-select">
+    <button type="button" class="league-tab" [class.active]="league() === 'great'" (click)="setLeague('great')">
+      スーパーリーグ
+    </button>
+    <button type="button" class="league-tab" [class.active]="league() === 'hyper'" (click)="setLeague('hyper')">
+      ハイパーリーグ
+    </button>
+  </div>
+
+  <div class="evaluate-bar">
+    <span class="selected-count">{{ selectedIds().length }} / 3 選択中</span>
+    <button type="button" class="evaluate-btn" [disabled]="selectedIds().length === 0" (click)="goToEvaluate()">
+      評価する
+    </button>
+  </div>
+
+  @if (loading()) {
+    <p class="status">読み込み中...</p>
+  } @else if (loadError()) {
+    <p class="status error">データの読み込みに失敗しました。</p>
+  } @else {
+    <p class="status count">{{ filteredStats().length }}匹表示中</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>図鑑番号</th>
+            <th>名前</th>
+            <th>タイプ</th>
+            <th>CP(Lv)</th>
+            <th>こうげき</th>
+            <th>ぼうぎょ</th>
+            <th>HP</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of filteredStats(); track p.speciesId) {
+            <tr>
+              <td>
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(p.speciesId)"
+                  [disabled]="!isSelected(p.speciesId) && selectedIds().length >= 3"
+                  (change)="toggleSelect(p.speciesId)"
+                />
+              </td>
+              <td>#{{ p.dex }}</td>
+              <td>{{ p.name }}</td>
+              <td class="type-cell">
+                @for (t of p.types; track t) {
+                  <span class="badge" [style.background]="typeColor[t]">{{ typeLabel[t] }}</span>
+                }
+              </td>
+              <td>
+                @if (leagueMapFor(p.speciesId); as e) {
+                  CP{{ e.cp }}(Lv{{ e.level }})
+                } @else {
+                  <span class="league-none">-</span>
+                }
+              </td>
+              <td>{{ (leagueMapFor(p.speciesId))?.atk | number: '1.0-0' }}</td>
+              <td>{{ (leagueMapFor(p.speciesId))?.def | number: '1.0-0' }}</td>
+              <td>{{ (leagueMapFor(p.speciesId))?.hp }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+} @else {
+  <div class="eval-header">
+    <button type="button" class="back-btn" (click)="backToSelect()">← 選び直す</button>
+    <h2>{{ league() === 'great' ? 'スーパーリーグ' : 'ハイパーリーグ' }}での比較</h2>
+  </div>
+
+  <div class="compare-columns">
+    @for (col of comparisonColumns(); track col.stat.speciesId) {
+      <div class="compare-col">
+        <div class="col-header">
+          <div class="col-name">#{{ col.stat.dex }} {{ col.stat.name }}</div>
+          <div class="col-types">
+            @for (t of col.stat.types; track t) {
+              <span class="badge" [style.background]="typeColor[t]">{{ typeLabel[t] }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="stat-block">
+          <div class="stat-row"><span>レベル</span><span>{{ col.level ?? '-' }}</span></div>
+          <div class="stat-row"><span>CP</span><span>{{ col.cp ?? '-' }}</span></div>
+          <div class="stat-row"><span>こうげき</span><span>{{ col.atk | number: '1.0-2' }}</span></div>
+          <div class="stat-row"><span>ぼうぎょ</span><span>{{ col.def | number: '1.0-2' }}</span></div>
+          <div class="stat-row"><span>HP</span><span>{{ col.hp ?? '-' }}</span></div>
+        </div>
+
+        <div class="type-block">
+          @for (t of types; track t.name) {
+            <div class="type-row">
+              <span class="type-name" [style.background]="t.color">{{ t.label }}</span>
+              <span class="type-symbol">{{ symbolFor(col.effectiveness[t.name]) }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="moves-block">
+          <p class="moves-label">ノーマルアタック</p>
+          @for (m of col.fastMoves; track m.id) {
+            <div class="move-line">
+              <span class="move-type" [style.background]="typeColor[m.entry.type]">{{ typeLabel[m.entry.type] }}</span>
+              {{ m.entry.name }}
+            </div>
+          }
+          <p class="moves-label">スペシャルアタック</p>
+          @for (m of col.chargedMoves; track m.id) {
+            <div class="move-line">
+              <span class="move-type" [style.background]="typeColor[m.entry.type]">{{ typeLabel[m.entry.type] }}</span>
+              {{ m.entry.name }}
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

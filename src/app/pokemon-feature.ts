@@ -11,6 +11,7 @@ import {
 import { PokemonStatsList } from './pokemon-stats-list';
 import { PokemonStatsSearch } from './pokemon-stats-search';
 import { PokemonMoveSearch } from './pokemon-move-search';
+import { PokemonCompare } from './pokemon-compare';
 import { PokemonDetail } from './pokemon-detail';
 import { League, PokemonSelectEvent, PokemonStat } from './pokemon-stats';
 
@@ -20,7 +21,7 @@ interface EffectivenessGroup {
   types: TypeInfo[];
 }
 
-type Tab = 'compat' | 'stats' | 'search' | 'moves';
+type Tab = 'compat' | 'stats' | 'search' | 'moves' | 'compare';
 type CompatMode = 'defense' | 'attack';
 
 const MAX_SELECTED = 2;
@@ -57,7 +58,7 @@ function toGroups(effectiveness: Record<TypeName, number>, types: TypeInfo[]): E
 
 @Component({
   selector: 'app-pokemon-feature',
-  imports: [PokemonStatsList, PokemonStatsSearch, PokemonMoveSearch, PokemonDetail],
+  imports: [PokemonStatsList, PokemonStatsSearch, PokemonMoveSearch, PokemonCompare, PokemonDetail],
   templateUrl: './pokemon-feature.html',
   styleUrl: './pokemon-feature.scss',
 })
