@@ -30,7 +30,16 @@
   </div>
 
   <div class="evaluate-bar">
-    <span class="selected-count">{{ selectedIds().length }} / 3 選択中</span>
+    <div class="selected-chips">
+      @if (selectedStats().length === 0) {
+        <span class="placeholder">最大3体まで選んでください</span>
+      }
+      @for (s of selectedStats(); track s.speciesId) {
+        <button type="button" class="chip" (click)="toggleSelect(s.speciesId)">
+          {{ s.name }} <span class="chip-remove">×</span>
+        </button>
+      }
+    </div>
     <button type="button" class="evaluate-btn" [disabled]="selectedIds().length === 0" (click)="goToEvaluate()">
       評価する
     </button>
@@ -47,7 +56,6 @@
       <table>
         <thead>
           <tr>
-            <th></th>
             <th>図鑑番号</th>
             <th>名前</th>
             <th>タイプ</th>
@@ -59,15 +67,7 @@
         </thead>
         <tbody>
           @for (p of filteredStats(); track p.speciesId) {
-            <tr>
-              <td>
-                <input
-                  type="checkbox"
-                  [checked]="isSelected(p.speciesId)"
-                  [disabled]="!isSelected(p.speciesId) && selectedIds().length >= 3"
-                  (change)="toggleSelect(p.speciesId)"
-                />
-              </td>
+            <tr [class.selected]="isSelected(p.speciesId)" (click)="toggleSelect(p.speciesId)">
               <td>#{{ p.dex }}</td>
               <td>{{ p.name }}</td>
               <td class="type-cell">

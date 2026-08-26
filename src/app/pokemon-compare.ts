@@ -92,15 +92,19 @@ export class PokemonCompare {
     return rows;
   });
 
+  protected readonly selectedStats = computed<PokemonStat[]>(() => {
+    const allStats = this.allStats();
+    return this.selectedIds()
+      .map((id) => allStats.find((s) => s.speciesId === id))
+      .filter((s): s is PokemonStat => !!s);
+  });
+
   protected readonly comparisonColumns = computed<ComparisonColumn[]>(() => {
     const leagueMap = this.leagueMap();
     const moves = this.moves();
     const movesets = this.movesets();
-    const allStats = this.allStats();
 
-    return this.selectedIds()
-      .map((id) => allStats.find((s) => s.speciesId === id))
-      .filter((s): s is PokemonStat => !!s)
+    return this.selectedStats()
       .map((stat) => {
         const entry = leagueMap[stat.speciesId] ?? null;
         const moveset = movesets[stat.speciesId];

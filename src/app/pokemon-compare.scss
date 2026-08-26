@@ -74,10 +74,39 @@
   border: 1px solid #e5e5e5;
 }
 
-.selected-count {
-  font-size: 0.85rem;
-  color: #555;
+.selected-chips {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  .placeholder {
+    font-size: 0.85rem;
+    color: #999;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid #333;
+  background: #333;
+  color: #fff;
+  font-size: 0.8rem;
   font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: #111;
+  }
+}
+
+.chip-remove {
+  font-weight: 700;
+  opacity: 0.8;
 }
 
 .evaluate-btn {
@@ -139,6 +168,18 @@ thead th {
   background: #fafafa;
   font-weight: 600;
   color: #444;
+}
+
+tbody tr {
+  cursor: pointer;
+
+  &:hover {
+    background: #f7f9fc;
+  }
+
+  &.selected {
+    background: #e7f0fb;
+  }
 }
 
 .type-cell {
