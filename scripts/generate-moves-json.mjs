@@ -115,16 +115,16 @@ async function main() {
     movesets[mon.speciesId] = entry;
   }
 
-  // 種族値検索の「技タイプで絞り込む」用に、各種族が持つ技タイプの集合だけを
-  // 軽量な専用ファイルとして書き出す(威力やエネルギーなどは不要なため)
+  // 種族値検索の「技タイプで絞り込む」用に、各種族が持つ技タイプの集合を
+  // ノーマルアタック(fast)/スペシャルアタック(charged)に分けた軽量な専用ファイルとして書き出す
+  // (威力やエネルギーなどは不要なため)
   const moveTypes = {};
   for (const [speciesId, set] of Object.entries(movesets)) {
-    const types = new Set();
-    for (const id of [...set.fast, ...set.charged]) {
-      const m = moves[id];
-      if (m) types.add(m.type);
-    }
-    moveTypes[speciesId] = [...types];
+    const typesOf = (ids) => [...new Set(ids.map((id) => moves[id]?.type).filter(Boolean))];
+    moveTypes[speciesId] = {
+      fast: typesOf(set.fast),
+      charged: typesOf(set.charged),
+    };
   }
 
   writeFileSync(join(publicDir, 'pokemon-go-moves.json'), JSON.stringify(moves));

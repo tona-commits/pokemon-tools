@@ -17,7 +17,7 @@ import {
   styleUrl: './pokemon-stats-list.scss',
 })
 export class PokemonStatsList {
-  readonly select = output<PokemonSelectEvent>();
+  readonly pokemonSelect = output<PokemonSelectEvent>();
   /** 指定した場合、一覧をこの種族IDの集合だけに絞り込む(例: 技検索からの遷移) */
   readonly restrictToSpeciesIds = input<ReadonlySet<string> | null>(null);
 
@@ -86,7 +86,7 @@ export class PokemonStatsList {
   }
 
   protected onSelect(pokemon: PokemonStat): void {
-    this.select.emit({ pokemon, league: this.showHyperLeague() ? 'hyper' : 'great' });
+    this.pokemonSelect.emit({ pokemon, league: this.showHyperLeague() ? 'hyper' : 'great' });
   }
 
   protected setSort(key: SortKey): void {

@@ -14,6 +14,11 @@ type SearchSortKey = 'dex' | 'atk' | 'def' | 'hp' | 'total';
 
 const MAX_TYPE_FILTER = 2;
 
+interface MoveTypesBySpecies {
+  fast: TypeName[];
+  charged: TypeName[];
+}
+
 interface DisplayRow {
   stat: PokemonStat;
   atk: number;
@@ -32,7 +37,7 @@ interface DisplayRow {
   styleUrl: './pokemon-stats-search.scss',
 })
 export class PokemonStatsSearch {
-  readonly select = output<PokemonSelectEvent>();
+  readonly pokemonSelect = output<PokemonSelectEvent>();
 
   protected readonly types = TYPES;
   protected readonly typeLabel = TYPE_LABEL;
@@ -57,7 +62,9 @@ export class PokemonStatsSearch {
 
   protected readonly showMoveTypeFilter = signal(false);
   protected readonly moveTypeFilter = signal<TypeName[]>([]);
-  private readonly moveTypesBySpecies = signal<Record<string, TypeName[]>>({});
+  protected readonly moveCategoryFast = signal(true);
+  protected readonly moveCategoryCharged = signal(true);
+  private readonly moveTypesBySpecies = signal<Record<string, MoveTypesBySpecies>>({});
 
   private readonly grayThreshold = computed(() =>
     this.league() === 'great' ? GREAT_LEAGUE_GRAY_CP : HYPER_LEAGUE_GRAY_CP,
@@ -108,6 +115,8 @@ export class PokemonStatsSearch {
     const types = this.typeFilter();
     const moveTypes = this.moveTypeFilter();
     const moveTypesBySpecies = this.moveTypesBySpecies();
+    const includeFast = this.moveCategoryFast();
+    const includeCharged = this.moveCategoryCharged();
 
     let rows = this.rows();
 
@@ -115,10 +124,19 @@ export class PokemonStatsSearch {
       rows = rows.filter((r) => types.every((t) => r.stat.types.includes(t)));
     }
 
-    if (moveTypes.length > 0) {
-      rows = rows.filter((r) =>
-        (moveTypesBySpecies[r.stat.speciesId] ?? []).some((t) => moveTypes.includes(t)),
-      );
+    if (moveTypes.length > 0 && (includeFast || includeCharged)) {
+      rows = rows.filter((r) => {
+        const entry = moveTypesBySpecies[r.stat.speciesId];
+        if (!entry) return false;
+        const candidates = [
+          ...(includeFast ? entry.fast : []),
+          ...(includeCharged ? entry.charged : []),
+        ];
+        return candidates.some((t) => moveTypes.includes(t));
+      });
+    } else if (moveTypes.length > 0) {
+      // ノーマル/スペシャルどちらのチェックも外れている場合は該当なし
+      rows = [];
     }
 
     if (term) {
@@ -187,7 +205,7 @@ export class PokemonStatsSearch {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.json();
         })
-        .then((data: Record<string, TypeName[]>) => this.moveTypesBySpecies.set(data))
+        .then((data: Record<string, MoveTypesBySpecies>) => this.moveTypesBySpecies.set(data))
         .catch(() => {
           // 読み込み失敗時は絞り込み結果が空になる(該当データなし扱い)
         });
@@ -216,7 +234,7 @@ export class PokemonStatsSearch {
   }
 
   protected onSelect(pokemon: PokemonStat): void {
-    this.select.emit({ pokemon, league: this.league() === 'hyper' ? 'hyper' : 'great' });
+    this.pokemonSelect.emit({ pokemon, league: this.league() === 'hyper' ? 'hyper' : 'great' });
   }
 
   protected setSort(key: SearchSortKey): void {

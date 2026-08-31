@@ -5,6 +5,7 @@
     placeholder="名前 または 図鑑番号で検索"
     [value]="searchTerm()"
     (input)="searchTerm.set($any($event.target).value)"
+    (focus)="$any($event.target).select()"
   />
 </div>
 
@@ -59,6 +60,24 @@
   </button>
 
   @if (showMoveTypeFilter()) {
+    <div class="move-category-row">
+      <label class="category-toggle">
+        <input
+          type="checkbox"
+          [checked]="moveCategoryFast()"
+          (change)="moveCategoryFast.set($any($event.target).checked)"
+        />
+        ノーマルアタック
+      </label>
+      <label class="category-toggle">
+        <input
+          type="checkbox"
+          [checked]="moveCategoryCharged()"
+          (change)="moveCategoryCharged.set($any($event.target).checked)"
+        />
+        スペシャルアタック
+      </label>
+    </div>
     <div class="type-grid">
       @for (t of types; track t.name) {
         <button

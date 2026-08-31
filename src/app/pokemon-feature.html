@@ -86,15 +86,15 @@
   </div>
 
   <div [hidden]="activeTab() !== 'stats'">
-    <app-pokemon-stats-list (select)="openDetail($event)" />
+    <app-pokemon-stats-list (pokemonSelect)="openDetail($event)" />
   </div>
 
   <div [hidden]="activeTab() !== 'search'">
-    <app-pokemon-stats-search (select)="openDetail($event)" />
+    <app-pokemon-stats-search (pokemonSelect)="openDetail($event)" />
   </div>
 
   <div [hidden]="activeTab() !== 'moves'">
-    <app-pokemon-move-search (select)="openDetail($event)" />
+    <app-pokemon-move-search (pokemonSelect)="openDetail($event)" />
   </div>
 
   <div [hidden]="activeTab() !== 'compare'">

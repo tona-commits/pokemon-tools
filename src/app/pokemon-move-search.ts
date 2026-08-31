@@ -17,7 +17,7 @@ interface MoveListItem {
   styleUrl: './pokemon-move-search.scss',
 })
 export class PokemonMoveSearch {
-  readonly select = output<PokemonSelectEvent>();
+  readonly pokemonSelect = output<PokemonSelectEvent>();
 
   protected readonly types = TYPES;
   protected readonly typeLabel = TYPE_LABEL;

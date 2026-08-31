@@ -11,7 +11,7 @@
 
   <app-pokemon-stats-list
     [restrictToSpeciesIds]="speciesIdsForSelectedMove()"
-    (select)="select.emit($event)"
+    (pokemonSelect)="pokemonSelect.emit($event)"
   />
 } @else {
   <div class="toolbar">
@@ -21,6 +21,7 @@
       placeholder="技名で検索"
       [value]="searchTerm()"
       (input)="searchTerm.set($any($event.target).value)"
+      (focus)="$any($event.target).select()"
     />
   </div>
 

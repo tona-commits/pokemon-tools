@@ -5,6 +5,7 @@
     placeholder="名前 または 図鑑番号で検索"
     [value]="searchTerm()"
     (input)="searchTerm.set($any($event.target).value)"
+    (focus)="$any($event.target).select()"
   />
 </div>
 

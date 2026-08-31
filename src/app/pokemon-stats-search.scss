@@ -65,6 +65,25 @@
   }
 }
 
+.move-category-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.category-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #555;
+  cursor: pointer;
+
+  input {
+    cursor: pointer;
+  }
+}
+
 .type-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
