@@ -30,5 +30,5 @@ export interface PokemonSelectEvent {
 }
 
 // リーグとして実用的とみなすCPのしきい値。これ未満はグレー表示にする
-export const GREAT_LEAGUE_GRAY_CP = 1400;
-export const HYPER_LEAGUE_GRAY_CP = 2300;
+export const GREAT_LEAGUE_GRAY_CP = 1300;
+export const HYPER_LEAGUE_GRAY_CP = 2200;
