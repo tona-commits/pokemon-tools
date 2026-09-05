@@ -111,10 +111,50 @@
       </div>
     }
   </section>
+
+  <section class="type-effect-section">
+    <h2>タイプ相性(被弾時)</h2>
+    <div class="results">
+      @for (group of typeEffectivenessGroups(); track group.multiplier) {
+        <div class="result-group" [class.emphasis]="group.multiplier >= 1.6">
+          <h3 class="result-label">{{ group.label }}</h3>
+          <div class="chip-row">
+            @for (t of group.types; track t.name) {
+              <span class="badge" [style.background]="t.color">{{ t.label }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
 </main>
 
+@if (activeMoveEffectivenessGroups(); as groups) {
+  <div class="move-effect-float">
+    <p class="move-effect-title">この技のタイプ相性</p>
+    <div class="results">
+      @for (group of groups; track group.multiplier) {
+        <div class="result-group" [class.emphasis]="group.multiplier >= 1.6">
+          <h3 class="result-label">{{ group.label }}</h3>
+          <div class="chip-row">
+            @for (t of group.types; track t.name) {
+              <span class="badge" [style.background]="t.color">{{ t.label }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+
 <ng-template #moveRow let-m="m">
-  <div class="move-row">
+  <div
+    class="move-row"
+    (pointerdown)="showMoveEffectiveness(m.entry.type)"
+    (pointerup)="hideMoveEffectiveness()"
+    (pointerleave)="hideMoveEffectiveness()"
+    (pointercancel)="hideMoveEffectiveness()"
+  >
     <span class="move-type" [style.background]="typeColorFor(m.entry.type)">{{ typeLabelFor(m.entry.type) }}</span>
     <div class="move-main">
       <span class="move-name">

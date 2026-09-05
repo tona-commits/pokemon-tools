@@ -270,3 +270,68 @@ h2 {
     color: #c03028;
   }
 }
+
+.type-effect-section {
+  margin-top: 28px;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.result-group {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 12px 14px;
+
+  &.emphasis {
+    border-color: #d0d0d0;
+    background: #fafafa;
+  }
+
+  .result-label {
+    font-size: 0.9rem;
+    font-weight: 400;
+    margin: 0 0 10px;
+    color: #333;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+.move-effect-float {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: min(90vw, 420px);
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 14px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+
+  .move-effect-title {
+    margin: 0 0 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .results {
+    gap: 10px;
+  }
+
+  .result-group {
+    padding: 8px 10px;
+  }
+}

@@ -1,6 +1,14 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
-import { TYPE_COLOR, TYPE_LABEL } from './pokemon-types';
+import {
+  calcEffectiveness,
+  calcMoveEffectiveness,
+  EffectivenessGroup,
+  groupEffectiveness,
+  TYPE_COLOR,
+  TYPE_LABEL,
+  TypeName,
+} from './pokemon-types';
 import { League, PokemonStat } from './pokemon-stats';
 import { findMaxLevelUnderCp, GREAT_LEAGUE_CP_CAP, HYPER_LEAGUE_CP_CAP } from './cp-calculator';
 import { buildDisplayMoves, MoveEntry, MovesetEntry } from './pokemon-moves';
@@ -57,8 +65,27 @@ export class PokemonDetail {
     return buildDisplayMoves(moveset.charged, this.moves(), moveset.elite, moveset.legacy, p.types);
   });
 
+  protected readonly typeEffectivenessGroups = computed<EffectivenessGroup[]>(() =>
+    groupEffectiveness(calcEffectiveness(this.pokemon().types)),
+  );
+
+  protected readonly activeMoveType = signal<TypeName | null>(null);
+
+  protected readonly activeMoveEffectivenessGroups = computed<EffectivenessGroup[] | null>(() => {
+    const type = this.activeMoveType();
+    return type ? groupEffectiveness(calcMoveEffectiveness(type)) : null;
+  });
+
   protected setLeague(league: League): void {
     this.leagueOverride.set(league);
+  }
+
+  protected showMoveEffectiveness(type: TypeName): void {
+    this.activeMoveType.set(type);
+  }
+
+  protected hideMoveEffectiveness(): void {
+    this.activeMoveType.set(null);
   }
 
   protected typeColorFor(type: string): string {

@@ -170,3 +170,40 @@ export function calcMoveEffectiveness(attackType: TypeName): Record<TypeName, nu
   }
   return result;
 }
+
+export interface EffectivenessGroup {
+  multiplier: number;
+  label: string;
+  types: TypeInfo[];
+}
+
+export function labelForMultiplier(mult: number): string {
+  switch (mult) {
+    case 2.56:
+      return '効果は抜群(弱点タイプ一致) ×2.56';
+    case 1.6:
+      return '効果は抜群 ×1.6';
+    case 1:
+      return '効果は普通 ×1';
+    case 0.625:
+      return '効果はいまひとつ ×0.625';
+    case 0.390625:
+      return '効果はいまひとつ(耐性タイプ一致) ×0.39';
+    default:
+      return `×${mult}`;
+  }
+}
+
+/** タイプ相性の倍率マップを、倍率ごとにグループ化してラベル付けする(倍率の高い順) */
+export function groupEffectiveness(effectiveness: Record<TypeName, number>): EffectivenessGroup[] {
+  const buckets = new Map<number, TypeInfo[]>();
+  for (const t of TYPES) {
+    const mult = effectiveness[t.name];
+    if (!buckets.has(mult)) buckets.set(mult, []);
+    buckets.get(mult)!.push(t);
+  }
+
+  return Array.from(buckets.entries())
+    .sort((a, b) => b[0] - a[0])
+    .map(([multiplier, groupTypes]) => ({ multiplier, label: labelForMultiplier(multiplier), types: groupTypes }));
+}

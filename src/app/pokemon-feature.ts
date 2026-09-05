@@ -2,6 +2,8 @@ import { Component, computed, signal, output } from '@angular/core';
 import {
   calcEffectiveness,
   calcMoveEffectiveness,
+  EffectivenessGroup,
+  groupEffectiveness,
   TYPE_COLOR,
   TYPE_LABEL,
   TYPES,
@@ -15,46 +17,10 @@ import { PokemonCompare } from './pokemon-compare';
 import { PokemonDetail } from './pokemon-detail';
 import { League, PokemonSelectEvent, PokemonStat } from './pokemon-stats';
 
-interface EffectivenessGroup {
-  multiplier: number;
-  label: string;
-  types: TypeInfo[];
-}
-
 type Tab = 'compat' | 'stats' | 'search' | 'moves' | 'compare';
 type CompatMode = 'defense' | 'attack';
 
 const MAX_SELECTED = 2;
-
-function labelForMultiplier(mult: number): string {
-  switch (mult) {
-    case 2.56:
-      return '効果は抜群(弱点タイプ一致) ×2.56';
-    case 1.6:
-      return '効果は抜群 ×1.6';
-    case 1:
-      return '効果は普通 ×1';
-    case 0.625:
-      return '効果はいまひとつ ×0.625';
-    case 0.390625:
-      return '効果はいまひとつ(耐性タイプ一致) ×0.39';
-    default:
-      return `×${mult}`;
-  }
-}
-
-function toGroups(effectiveness: Record<TypeName, number>, types: TypeInfo[]): EffectivenessGroup[] {
-  const buckets = new Map<number, TypeInfo[]>();
-  for (const t of types) {
-    const mult = effectiveness[t.name];
-    if (!buckets.has(mult)) buckets.set(mult, []);
-    buckets.get(mult)!.push(t);
-  }
-
-  return Array.from(buckets.entries())
-    .sort((a, b) => b[0] - a[0])
-    .map(([multiplier, groupTypes]) => ({ multiplier, label: labelForMultiplier(multiplier), types: groupTypes }));
-}
 
 @Component({
   selector: 'app-pokemon-feature',
@@ -85,9 +51,9 @@ export class PokemonFeature {
     if (selected.length === 0) return [];
 
     if (this.compatMode() === 'attack') {
-      return toGroups(calcMoveEffectiveness(selected[0]), this.types);
+      return groupEffectiveness(calcMoveEffectiveness(selected[0]));
     }
-    return toGroups(calcEffectiveness(selected), this.types);
+    return groupEffectiveness(calcEffectiveness(selected));
   });
 
   protected isSelected(name: TypeName): boolean {
