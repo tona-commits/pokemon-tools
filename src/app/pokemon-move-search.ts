@@ -10,6 +10,38 @@ interface MoveListItem {
   category: 'fast' | 'charged';
 }
 
+// 2026年9月の技バランス調整で威力/エネルギーが変更、または新規追加された技
+const BALANCE_UPDATE_2026_09 = new Set([
+  'SCRATCH',
+  'AIR_CUTTER',
+  'BITE',
+  'INFESTATION',
+  'BODY_SLAM',
+  'SHADOW_BALL',
+  'POISON_FANG',
+  'DARK_PULSE',
+  'VOLT_TACKLE',
+  'SAND_TOMB',
+  'BULLDOZE',
+  'MOONBLAST',
+  'CHARGE_BEAM',
+  'DRAINING_KISS',
+  'IRON_HEAD',
+  'BUBBLE_BEAM',
+  'LOW_KICK',
+  'RAGE_FIST',
+  'HIGH_HORSEPOWER',
+  'MAGNET_BOMB',
+  'BLAZE_KICK',
+  'BRINE',
+  'LUNGE',
+  'MIRROR_COAT',
+  'TAKE_DOWN',
+  'PSYCHO_BOOST',
+  'SHADOW_FORCE',
+  'DOUBLE_IRON_BASH',
+]);
+
 @Component({
   selector: 'app-pokemon-move-search',
   imports: [PokemonStatsList],
@@ -30,12 +62,14 @@ export class PokemonMoveSearch {
 
   protected readonly searchTerm = signal('');
   protected readonly typeFilter = signal<TypeName | null>(null);
+  protected readonly onlyBalanceUpdate = signal(false);
   protected readonly selectedMoveId = signal<string | null>(null);
 
   protected readonly moveList = computed<MoveListItem[]>(() => {
     const moves = this.moves();
     const term = this.searchTerm().trim();
     const type = this.typeFilter();
+    const onlyBalanceUpdate = this.onlyBalanceUpdate();
 
     let items = Object.entries(moves).map(([id, entry]) => ({
       id,
@@ -45,6 +79,7 @@ export class PokemonMoveSearch {
 
     if (term) items = items.filter((m) => m.entry.name.includes(term));
     if (type) items = items.filter((m) => m.entry.type === type);
+    if (onlyBalanceUpdate) items = items.filter((m) => BALANCE_UPDATE_2026_09.has(m.id));
 
     return items.sort((a, b) => {
       if (a.entry.type !== b.entry.type) {

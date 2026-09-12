@@ -51,6 +51,23 @@
   }
 }
 
+.toggle-row {
+  margin-bottom: 12px;
+}
+
+.balance-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #555;
+  cursor: pointer;
+
+  input {
+    cursor: pointer;
+  }
+}
+
 .status {
   color: #666;
   font-size: 0.85rem;

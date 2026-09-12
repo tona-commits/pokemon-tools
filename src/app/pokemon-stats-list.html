@@ -19,6 +19,15 @@
     進化系もまとめて表示
   </label>
 
+  <label class="family-toggle">
+    <input
+      type="checkbox"
+      [checked]="onlyNewMove2026_09()"
+      (change)="onlyNewMove2026_09.set($any($event.target).checked)"
+    />
+    2026年９月技追加
+  </label>
+
   <button type="button" class="league-btn" [class.active]="showGreatLeague()" (click)="toggleGreatLeague()">
     スーパーリーグ
   </button>

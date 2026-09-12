@@ -10,6 +10,22 @@ import {
   SortKey,
 } from './pokemon-stats';
 
+// 2026年9月の技バランス調整で新しく技を覚えた種族
+const NEW_MOVE_2026_09 = new Set([
+  'raichu',
+  'raichu_alolan',
+  'miltank',
+  'volbeat',
+  'illumise',
+  'audino',
+  'grimmsnarl',
+  'ursaluna',
+  'maschiff',
+  'mabosstiff',
+  'grafaiai',
+  'kingambit',
+]);
+
 @Component({
   selector: 'app-pokemon-stats-list',
   imports: [DecimalPipe],
@@ -37,6 +53,7 @@ export class PokemonStatsList {
 
   protected readonly searchTerm = signal('');
   protected readonly showFamily = signal(true);
+  protected readonly onlyNewMove2026_09 = signal(false);
   protected readonly sortKey = signal<SortKey>('dex');
   protected readonly sortDesc = signal(false);
 
@@ -52,6 +69,9 @@ export class PokemonStatsList {
     const desc = this.sortDesc();
 
     let rows = this.baseStats();
+    if (this.onlyNewMove2026_09()) {
+      rows = rows.filter((r) => NEW_MOVE_2026_09.has(r.speciesId));
+    }
     if (term) {
       const digitTerm = term.replace(/^#/, '');
       const matched = rows.filter(
